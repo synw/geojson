@@ -1,5 +1,7 @@
 # Geojson
 
+[![pub package](https://img.shields.io/pub/v/geojson.svg)](https://pub.dartlang.org/packages/geojson)
+
 Utilities to work with geojson data in Dart.
 
 ## Example
