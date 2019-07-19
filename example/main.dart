@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:geojson/geojson.dart';
 
+// data is from http://www.naturalearthdata.com
+
 void main() async {
   final file = File("railroads_of_north_america.geojson");
   polygons(file);
