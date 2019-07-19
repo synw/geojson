@@ -9,8 +9,8 @@ Utilities to work with geojson data in Dart.
    import 'package:geojson/geojson.dart';
 
    void main() async {
-     polygons(file);
-     lines(file);
+     polygons();
+     lines();
    }
 
    void polygons() async {
