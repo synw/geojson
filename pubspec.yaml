@@ -1,8 +1,8 @@
 name: geojson
-description: Manipulate geojson data.
+description: Manipulate geojson data. Load and parse geojson from a string or a file.
 author: synw <ansterj@gmail.com>
 homepage: https://github.com/synw/geojson
-version: 0.2.0
+version: 0.1.0
 
 environment:
   sdk: '>=2.0.0 <3.0.0'
@@ -10,7 +10,7 @@ environment:
 dependencies:
   meta: ^1.1.6
   pedantic: ^1.6.0
-  geopoint: ^0.3.0
+  geopoint: ^0.4.0
 
 dev_dependencies:
   test: ^1.4.0
