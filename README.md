@@ -15,7 +15,7 @@ Utilities to work with geojson data in Dart.
 
    void polygons() async {
      final file = File("lakes_of_europe.geojson");
-     final geoSeries = await geoSerieFromFile(file, nameProperty: "label");
+     final geoSeries = await geoSerieFromGeoJsonFile(file, nameProperty: "label");
      for (final geoSerie in geoSeries) {
        print("${geoSerie.name}: ${geoSerie.geoPoints.length} geopoints");
      }
@@ -23,7 +23,7 @@ Utilities to work with geojson data in Dart.
 
    void lines() async {
      final file = File("railroads_of_north_america.geojson");
-     final geoSeries = await geoSerieFromFile(file, nameProperty: "continent");
+     final geoSeries = await geoSerieFromGeoJsonFile(file, nameProperty: "continent");
      for (final geoSerie in geoSeries) {
        print("${geoSerie.name}: ${geoSerie.geoPoints.length} geopoints");
      }
@@ -32,7 +32,14 @@ Utilities to work with geojson data in Dart.
 
 ## Api
 
-`geoSerieFromFile`: create geoseries from a geojson file. Parameters:
+`geoSerieFromGeoJson`: create geoseries from geojson string data. Parameters:
+
+- `data`: a string with the geojson data
+- `nameProperty`: the property used for the geoserie name, default "name"
+- `type`: the geoserie type, infered from the file if not provided
+- `verbose`: print data if true
+
+`geoSerieFromGeoJsonFile`: create geoseries from a geojson file. Parameters:
 
 - `file`: the file to load, required
 - `nameProperty`: the property used for the geoserie name, default "name"
