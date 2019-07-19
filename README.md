@@ -34,9 +34,9 @@ Utilities to work with geojson data in Dart.
 
 `geoSerieFromGeoJson`: create geoseries from geojson string data. Parameters:
 
-- `data`: a string with the geojson data
+- `data`: a string with the geojson data, required
 - `nameProperty`: the property used for the geoserie name, default "name"
-- `type`: the geoserie type, infered from the file if not provided
+- `type`: the geoserie type, infered from data if not provided
 - `verbose`: print data if true
 
 `geoSerieFromGeoJsonFile`: create geoseries from a geojson file. Parameters:
