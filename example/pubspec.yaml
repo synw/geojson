@@ -1,0 +1,15 @@
+name: geojson_example
+description: Manipulate geojson data.
+author: synw <ansterj@gmail.com>
+homepage: https://github.com/synw/geojson
+version: 0.1.0
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  geojson:
+    path: ../
+
+dev_dependencies:
+  test: ^1.4.0
