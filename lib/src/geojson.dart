@@ -31,6 +31,10 @@ Future<List<GeoSerie>> geoSerieFromGeoJson(String data,
       geomTypeLabel = "Line";
       coordsList = geometry["coordinates"] as List<dynamic>;
       type = GeoSerieType.line;
+    } else if (geomType == "Polygon") {
+      geomTypeLabel = "Polygon";
+      coordsList = geometry["coordinates"][0] as List<dynamic>;
+      type = GeoSerieType.polygon;
     }
     for (final coord in coordsList) {
       final geoPoint = GeoPoint(
