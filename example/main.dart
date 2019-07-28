@@ -5,11 +5,11 @@ import 'package:geojson/geojson.dart';
 
 void main() async {
   final file = File("railroads_of_north_america.geojson");
-  polygons(file);
+  multipolygons(file);
   lines(file);
 }
 
-void polygons(File file) async {
+void multipolygons(File file) async {
   final file = File("lakes_of_europe.geojson");
   final features = await featuresFromGeoJsonFile(file, nameProperty: "label");
   for (final feature in features.collection) {
@@ -17,7 +17,7 @@ void polygons(File file) async {
     for (final polygon in geom.polygons) {
       print("Polygon ${polygon.name}");
       for (final geoSerie in polygon.geoSeries) {
-        print("${geoSerie.name}: " + "${geoSerie.geoPoints.length} geopoints");
+        print("- ${geoSerie.geoPoints.length} geopoints");
       }
     }
   }
@@ -25,27 +25,9 @@ void polygons(File file) async {
 
 void lines(File file) async {
   final file = File("railroads_of_north_america.geojson");
-  final features =
-      await featuresFromGeoJsonFile(file, nameProperty: "continent");
+  final features = await featuresFromGeoJsonFile(file);
   for (final feature in features.collection) {
     print("${feature.geometry.geoSerie.name}: " +
         "${feature.geometry.geoSerie.geoPoints.length} geopoints");
   }
 }
-/*
-void _polygons(File file) async {
-  final file = File("lakes_of_europe.geojson");
-  final geoSeries = await geoSerieFromGeoJsonFile(file, nameProperty: "label");
-  for (final geoSerie in geoSeries) {
-    print("${geoSerie.name}: ${geoSerie.geoPoints.length} geopoints");
-  }
-}
-
-void _lines(File file) async {
-  final file = File("railroads_of_north_america.geojson");
-  final geoSeries =
-      await geoSerieFromGeoJsonFile(file, nameProperty: "continent");
-  for (final geoSerie in geoSeries) {
-    print("${geoSerie.name}: ${geoSerie.geoPoints.length} geopoints");
-  }
-}*/
