@@ -4,12 +4,11 @@ import 'package:geojson/geojson.dart';
 // data is from http://www.naturalearthdata.com
 
 void main() async {
-  final file = File("railroads_of_north_america.geojson");
-  multipolygons(file);
-  lines(file);
+  multipolygons();
+  lines();
 }
 
-void multipolygons(File file) async {
+void multipolygons() async {
   final file = File("lakes_of_europe.geojson");
   final features = await featuresFromGeoJsonFile(file, nameProperty: "label");
   for (final feature in features.collection) {
@@ -23,7 +22,7 @@ void multipolygons(File file) async {
   }
 }
 
-void lines(File file) async {
+void lines() async {
   final file = File("railroads_of_north_america.geojson");
   final features = await featuresFromGeoJsonFile(file);
   for (final feature in features.collection) {
