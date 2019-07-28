@@ -35,14 +35,14 @@ FeatureCollection featuresFromGeoJson(String data,
         break;
       case "MultiLineString":
         feature.type = FeatureType.multiline;
-        feature.geometry = getLine(
+        feature.geometry = getMultiLine(
             feature: feature,
             nameProperty: nameProperty,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       case "LineString":
         feature.type = FeatureType.line;
-        feature.geometry = getMultiLine(
+        feature.geometry = getLine(
             feature: feature,
             nameProperty: nameProperty,
             coordinates: geometry["coordinates"] as List<dynamic>);
