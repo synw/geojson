@@ -1,8 +1,93 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:geopoint/geopoint.dart';
+import 'models.dart';
+import 'deseriializers.dart';
 
+/// Get a feature collection from a geojson string
+FeatureCollection featuresFromGeoJson(String data,
+    {String nameProperty, bool verbose = false}) {
+  final features = FeatureCollection();
+  final Map<String, dynamic> decoded =
+      json.decode(data) as Map<String, dynamic>;
+  final feats = decoded["features"] as List<dynamic>;
+  for (final dfeature in feats) {
+    final feat = dfeature as Map<String, dynamic>;
+    final properties = feat["properties"] as Map<String, dynamic>;
+    final geometry = feat["geometry"] as Map<String, dynamic>;
+    final geomType = geometry["type"].toString();
+    final feature = Feature();
+    feature.properties = properties;
+    switch (geomType) {
+      case "MultiPolygon":
+        feature.type = FeatureType.multipolygon;
+        feature.geometry = getMultipolygon(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "Polygon":
+        feature.type = FeatureType.polygon;
+        feature.geometry = getPolygon(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "MultiLineString":
+        feature.type = FeatureType.multiline;
+        feature.geometry = getLine(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "LineString":
+        feature.type = FeatureType.line;
+        feature.geometry = getMultiLine(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "MultiPoint":
+        feature.type = FeatureType.multipoint;
+        feature.geometry = getMultiPoint(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "Point":
+        feature.type = FeatureType.point;
+        feature.geometry = getPoint(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      default:
+    }
+    if (feature.type != null) {
+      features.collection.add(feature);
+    }
+  }
+  return features;
+}
+
+/// Get a feature collection from a geojson file
+Future<FeatureCollection> featuresFromGeoJsonFile(File file,
+    {String nameProperty, bool verbose = false}) async {
+  FeatureCollection features;
+  if (!file.existsSync()) {
+    throw ("File ${file.path} does not exist");
+  }
+  String data;
+  try {
+    data = await file.readAsString();
+  } catch (e) {
+    throw ("Can not read file $e");
+  }
+  features = featuresFromGeoJson(data, verbose: verbose);
+  return features;
+}
+
+/*
 /// Get a [GeoSerie] list from a geojson string
 Future<List<GeoSerie>> geoSerieFromGeoJson(String data,
     {String nameProperty,
@@ -71,3 +156,4 @@ Future<List<GeoSerie>> geoSerieFromGeoJsonFile(File file,
   return geoSerieFromGeoJson(data,
       nameProperty: nameProperty, type: type, verbose: verbose);
 }
+*/
