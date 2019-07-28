@@ -123,8 +123,8 @@ List<GeoPoint> _getGeoPoints(List<dynamic> coordsList) {
   final geoPoints = <GeoPoint>[];
   for (final coord in coordsList) {
     final geoPoint = GeoPoint(
-        latitude: double.parse(coord[0].toString()),
-        longitude: double.parse(coord[1].toString()));
+        latitude: double.parse(coord[1].toString()),
+        longitude: double.parse(coord[0].toString()));
     geoPoints.add(geoPoint);
   }
   return geoPoints;
