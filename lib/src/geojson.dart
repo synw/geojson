@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'models.dart';
 import 'deseriializers.dart';
+import 'exceptions.dart';
 
 /// Get a feature collection from a geojson string
 FeatureCollection featuresFromGeoJson(String data,
@@ -62,6 +63,8 @@ FeatureCollection featuresFromGeoJson(String data,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       default:
+        final e = FeatureNotSupported(geomType);
+        throw ("${e.message}");
     }
     if (feature.type != null) {
       features.collection.add(feature);
