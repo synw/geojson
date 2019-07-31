@@ -83,12 +83,12 @@ void main() {
     expect(point.geoPoint.longitude, 0);
     expect(point.name, "point");
   });
-
+/*
   test("unknown_feature", () async {
     try {
-      featuresFromGeoJson(geojsonUnsupported);
+      await featuresFromGeoJson(geojsonUnsupported);
     } on FeatureNotSupported catch (e) {
       expect(e.message, "The feature Unknown is not supported");
     }
-  });
+  });*/
 }
