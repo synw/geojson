@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3
+
+- Add tests
+- Fix coordinates in getPoint
+- Fix name parameter for Point
+- Fix unsupported feature exception throw
+
 ## 0.2.2
 
 - Add custom exception for unsupported features
