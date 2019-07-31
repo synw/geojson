@@ -17,10 +17,11 @@ FeatureCollection featuresFromGeoJson(String data,
     final properties = feat["properties"] as Map<String, dynamic>;
     final geometry = feat["geometry"] as Map<String, dynamic>;
     final geomType = geometry["type"].toString();
-    final feature = Feature();
-    feature.properties = properties;
+    Feature feature;
     switch (geomType) {
       case "MultiPolygon":
+        feature = Feature<MultiPolygon>();
+        feature.properties = properties;
         feature.type = FeatureType.multipolygon;
         feature.geometry = getMultipolygon(
             feature: feature,
@@ -28,6 +29,8 @@ FeatureCollection featuresFromGeoJson(String data,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       case "Polygon":
+        feature = Feature<Polygon>();
+        feature.properties = properties;
         feature.type = FeatureType.polygon;
         feature.geometry = getPolygon(
             feature: feature,
@@ -35,6 +38,8 @@ FeatureCollection featuresFromGeoJson(String data,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       case "MultiLineString":
+        feature = Feature<MultiLine>();
+        feature.properties = properties;
         feature.type = FeatureType.multiline;
         feature.geometry = getMultiLine(
             feature: feature,
@@ -42,6 +47,8 @@ FeatureCollection featuresFromGeoJson(String data,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       case "LineString":
+        feature = Feature<Line>();
+        feature.properties = properties;
         feature.type = FeatureType.line;
         feature.geometry = getLine(
             feature: feature,
@@ -49,6 +56,8 @@ FeatureCollection featuresFromGeoJson(String data,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       case "MultiPoint":
+        feature = Feature<MultiPoint>();
+        feature.properties = properties;
         feature.type = FeatureType.multipoint;
         feature.geometry = getMultiPoint(
             feature: feature,
@@ -56,6 +65,8 @@ FeatureCollection featuresFromGeoJson(String data,
             coordinates: geometry["coordinates"] as List<dynamic>);
         break;
       case "Point":
+        feature = Feature<Point>();
+        feature.properties = properties;
         feature.type = FeatureType.point;
         feature.geometry = getPoint(
             feature: feature,

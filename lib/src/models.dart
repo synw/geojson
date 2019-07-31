@@ -36,7 +36,7 @@ class FeatureCollection {
 }
 
 /// A geojson feature
-class Feature {
+class Feature<T> {
   /// The type of the feature
   FeatureType type;
 
@@ -44,7 +44,7 @@ class Feature {
   Map<String, dynamic> properties;
 
   /// The feature geo data
-  dynamic geometry;
+  T geometry;
 }
 
 /// A point
