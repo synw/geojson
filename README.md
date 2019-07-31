@@ -1,6 +1,6 @@
 # Geojson
 
-[![pub package](https://img.shields.io/pub/v/geojson.svg)](https://pub.dartlang.org/packages/geojson)
+[![pub package](https://img.shields.io/pub/v/geojson.svg)](https://pub.dartlang.org/packages/geojson) [![Build Status](https://travis-ci.org/synw/geojson.svg?branch=master)](https://travis-ci.org/synw/geojson) [![Coverage Status](https://coveralls.io/repos/github/synw/geojson/badge.svg?branch=master)](https://coveralls.io/github/synw/geojson?branch=master)
 
 Utilities to work with geojson data in Dart.
 
