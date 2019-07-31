@@ -1,12 +1,32 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:iso/iso.dart';
 import 'models.dart';
 import 'deserializers.dart';
 import 'exceptions.dart';
 
 /// Get a feature collection from a geojson string
-FeatureCollection featuresFromGeoJson(String data,
+Future<FeatureCollection> featuresFromGeoJson(String data,
+    {String nameProperty, bool verbose = false}) async {
+  FeatureCollection featureCollection;
+  final iso = Iso(_processFeatures, onDataOut: (dynamic data) {
+    final _result = data as FeatureCollection;
+    featureCollection = _result;
+  });
+  await iso.run();
+  iso.dispose();
+  return featureCollection;
+}
+
+void _processFeatures(IsoRunner iso) async {
+  final List<dynamic> args = iso.args;
+  final data = args[0] as String;
+  final featuresCollection = _featuresFromGeoJson(data);
+  iso.send(featuresCollection);
+}
+
+FeatureCollection _featuresFromGeoJson(String data,
     {String nameProperty, bool verbose = false}) {
   final features = FeatureCollection();
   final Map<String, dynamic> decoded =
@@ -98,7 +118,7 @@ Future<FeatureCollection> featuresFromGeoJsonFile(File file,
   } catch (e) {
     throw ("Can not read file $e");
   }
-  features = featuresFromGeoJson(data, verbose: verbose);
+  features = await _featuresFromGeoJson(data, verbose: verbose);
   return features;
 }
 
