@@ -8,6 +8,7 @@ Point getPoint(
   final name = _getName(feature: feature, nameProperty: nameProperty);
   final geoPoint = _getGeoPoints(<dynamic>[coordinates])[0];
   geoPoint.name = name;
+  point.name = name;
   point.geoPoint = geoPoint;
   return point;
 }
