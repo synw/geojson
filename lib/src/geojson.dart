@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'models.dart';
-import 'deseriializers.dart';
+import 'deserializers.dart';
 import 'exceptions.dart';
 
 /// Get a feature collection from a geojson string
