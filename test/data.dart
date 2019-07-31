@@ -123,3 +123,16 @@ var geojsonMultiPolygon = """{
     }
   ]
 }""";
+var geojsonUnsupported = """{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name": "point"},
+      "geometry": {
+        "type": "Unknown",
+        "coordinates": [0, 0]
+      }
+    }
+  ]
+}""";

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:geojson/src/exceptions.dart';
 import "package:test/test.dart";
 import "package:geojson/geojson.dart";
 import 'data.dart';
@@ -5,6 +8,7 @@ import 'data.dart';
 void main() {
   test("point", () async {
     final features = await featuresFromGeoJson(geojsonPoint);
+    expect(features.collection.length, 1);
     final feature = features.collection[0];
     expect(feature.type, FeatureType.point);
     final point = feature.geometry as Point;
@@ -53,5 +57,24 @@ void main() {
     expect(feature.type, FeatureType.multipolygon);
     final multipolygon = feature.geometry as MultiPolygon;
     expect(multipolygon.polygons.length, 3);
+  });
+
+  test("file", () async {
+    final features = await featuresFromGeoJsonFile(File("test/data.geojson"));
+    expect(features.collection.length, 1);
+    final feature = features.collection[0];
+    expect(feature.type, FeatureType.point);
+    final point = feature.geometry as Point;
+    expect(point.geoPoint.latitude, 0);
+    expect(point.geoPoint.longitude, 0);
+    expect(point.name, "point");
+  });
+
+  test("unknown_feature", () async {
+    try {
+      featuresFromGeoJson(geojsonUnsupported);
+    } on FeatureNotSupported catch (e) {
+      expect(e.message, "The feature Unknown is not supported");
+    }
   });
 }
