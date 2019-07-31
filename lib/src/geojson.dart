@@ -78,7 +78,7 @@ FeatureCollection featuresFromGeoJson(String data,
         break;
       default:
         final e = FeatureNotSupported(geomType);
-        throw ("${e.message}");
+        throw (e);
     }
     features.collection.add(feature);
   }
