@@ -74,4 +74,6 @@ build/
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
 # Coverage report
-coverage/output/
+test/.test_coverage.dart
+coverage/
+!coverage/lcov.info
