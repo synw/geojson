@@ -59,6 +59,20 @@ void main() {
     expect(multipolygon.polygons.length, 3);
   });
 
+  test("wrongfile", () async {
+    expect(
+        () async => await featuresFromGeoJsonFile(File("test/wrong.geojson")),
+        throwsA("File test/wrong.geojson does not exist"));
+  });
+
+  test("unreadablefile", () async {
+    final msg = 'Can not read file FileSystemException: ' +
+        'Failed to decode data using encoding \'utf-8\', ' +
+        'path = \'test/data.bin\'';
+    expect(() async => await featuresFromGeoJsonFile(File("test/data.bin")),
+        throwsA(msg));
+  });
+
   test("file", () async {
     final features = await featuresFromGeoJsonFile(File("test/data.geojson"));
     expect(features.collection.length, 1);
