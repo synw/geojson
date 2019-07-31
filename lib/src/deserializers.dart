@@ -6,7 +6,7 @@ Point getPoint(
     {List<dynamic> coordinates, Feature feature, String nameProperty}) {
   final point = Point();
   final name = _getName(feature: feature, nameProperty: nameProperty);
-  final geoPoint = _getGeoPoints(coordinates)[0];
+  final geoPoint = _getGeoPoints(<dynamic>[coordinates])[0];
   geoPoint.name = name;
   point.geoPoint = geoPoint;
   return point;
