@@ -4,8 +4,6 @@
 
 Utilities to work with geojson data in Dart.
 
-**Note**: the api is currently discussed and improved and may change
-
 ## Example
 
 ```dart
