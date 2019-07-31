@@ -14,7 +14,10 @@ FeatureCollection featuresFromGeoJson(String data,
   final feats = decoded["features"] as List<dynamic>;
   for (final dfeature in feats) {
     final feat = dfeature as Map<String, dynamic>;
-    final properties = feat["properties"] as Map<String, dynamic>;
+    var properties = <String, dynamic>{};
+    if (feat.containsKey("properties")) {
+      properties = feat["properties"] as Map<String, dynamic>;
+    }
     final geometry = feat["geometry"] as Map<String, dynamic>;
     final geomType = geometry["type"].toString();
     Feature feature;
