@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:pedantic/pedantic.dart';
 import 'package:iso/iso.dart';
 import 'package:meta/meta.dart';
 import 'models.dart';
@@ -13,17 +14,18 @@ Future<FeatureCollection> featuresFromGeoJson(String data,
   FeatureCollection featureCollection;
   final finished = Completer<Null>();
   Iso iso;
-  iso = Iso(_processFeatures,
-      onDataOut: (dynamic data) {
-        final _result = data as FeatureCollection;
-        featureCollection = _result;
-        iso.dispose();
-        finished.complete();
-      },
-      onError: (dynamic e) => throw (e));
+  iso = Iso(_processFeatures, onDataOut: (dynamic data) {
+    final _result = data as FeatureCollection;
+    featureCollection = _result;
+    iso.dispose();
+    finished.complete();
+  }, onError: (dynamic e) {
+    print("ERROR $e / ${e.runtimeType}");
+    throw (e);
+  });
   final dataToProcess =
       _DataToProcess(data: data, nameProperty: nameProperty, verbose: verbose);
-  await iso.run(<dynamic>[dataToProcess]);
+  unawaited(iso.run(<dynamic>[dataToProcess]));
   await finished.future;
   return featureCollection;
 }
