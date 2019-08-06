@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Run the parser in an isolate
+- Add a `feature.length` getter
+- Upgrade dependencies
+- Add examples for drawing on a Flutter map
+
 ## 0.2.3
 
 - Add tests
