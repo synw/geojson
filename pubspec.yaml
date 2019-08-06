@@ -8,9 +8,9 @@ environment:
   sdk: '>=2.3.0 <3.0.0'
 
 dependencies:
-  meta: ^1.1.7
-  geopoint: ^0.4.0
-  iso: ^0.2.2
+  meta: ^1.1.6
+  geopoint: ^0.4.1
+  iso: ^0.2.3
 
 dev_dependencies:
   test: ^1.6.5
