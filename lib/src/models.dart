@@ -45,6 +45,47 @@ class Feature<T> {
 
   /// The feature geo data
   T geometry;
+
+  /// The number of [GeoPoint] contained in the feature geometry
+  int get length => _length();
+
+  int _length() {
+    int total = 0;
+    switch (type) {
+      case FeatureType.point:
+        total = 1;
+        break;
+      case FeatureType.multipoint:
+        final g = geometry as MultiPoint;
+        total = g.geoSerie.geoPoints.length;
+        break;
+      case FeatureType.line:
+        final g = geometry as Line;
+        total = g.geoSerie.geoPoints.length;
+        break;
+      case FeatureType.multiline:
+        final g = geometry as MultiLine;
+        for (final line in g.lines) {
+          total = total + line.geoSerie.geoPoints.length;
+        }
+        break;
+      case FeatureType.polygon:
+        final g = geometry as Polygon;
+        for (final geoSerie in g.geoSeries) {
+          total = total + geoSerie.geoPoints.length;
+        }
+        break;
+      case FeatureType.multipolygon:
+        final g = geometry as MultiPolygon;
+        for (final polygon in g.polygons) {
+          for (final geoSerie in polygon.geoSeries) {
+            total = total + geoSerie.geoPoints.length;
+          }
+        }
+        break;
+    }
+    return total;
+  }
 }
 
 /// A point
