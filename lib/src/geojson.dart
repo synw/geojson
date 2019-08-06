@@ -132,6 +132,10 @@ FeatureCollection _featuresFromGeoJson(String data,
         final e = FeatureNotSupported(geomType);
         throw (e);
     }
+    if (verbose == true) {
+      print("${feature.geometry.name} ${feature.type} : " +
+          "${feature.length} points");
+    }
     features.collection.add(feature);
   }
   return features;
