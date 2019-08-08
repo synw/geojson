@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+
+Add a reactive api with streams to retrive features as soon as they are parsed
+
 ## 0.3.0
 
 - Run the parser in an isolate
