@@ -2,57 +2,68 @@
 
 [![pub package](https://img.shields.io/pub/v/geojson.svg)](https://pub.dartlang.org/packages/geojson) [![Build Status](https://travis-ci.org/synw/geojson.svg?branch=master)](https://travis-ci.org/synw/geojson) [![Coverage Status](https://coveralls.io/repos/github/synw/geojson/badge.svg?branch=master)](https://coveralls.io/github/synw/geojson?branch=master)
 
-Utilities to work with geojson data in Dart.
+Utilities to work with geojson data in Dart. Features:
 
-## Example
+- **Parser**: simple functions are available to parse geojson
+- **Reactive api**: streams are available to retrieve the geojson features as soon as they are parsed
 
-```dart
-import 'dart:io';
-import 'package:geojson/geojson.dart';
+Note: the data is parsed in an isolate to avoid slowing down the main thread
 
-void main() async {
-  multipolygons();
-  lines();
-}
-
-void multipolygons() async {
-  final file = File("lakes_of_europe.geojson");
-  final features = await featuresFromGeoJsonFile(file, nameProperty: "label");
-  for (final feature in features.collection) {
-    final geom = feature.geometry as MultiPolygon;
-    for (final polygon in geom.polygons) {
-      print("Polygon ${polygon.name}");
-      for (final geoSerie in polygon.geoSeries) {
-        print("- ${geoSerie.geoPoints.length} geopoints");
-      }
-    }
-  }
-}
-
-void lines() async {
-  final file = File("railroads_of_north_america.geojson");
-  final features = await featuresFromGeoJsonFile(file);
-  for (final feature in features.collection) {
-    print("${feature.geometry.geoSerie.name}: " +
-        "${feature.geometry.geoSerie.geoPoints.length} geopoints");
-  }
-}
-
-```
-
-## Api
+## Simple functions
 
 `featuresFromGeoJson`: get a `FeaturesCollection` from geojson string data. Parameters:
 
 - `data`: a string with the geojson data, required
 - `nameProperty`: the property used for the geoserie name, automaticaly set if null
-- `verbose`: print data if true
+- `verbose`: print the parsed data if true
 
 `featuresFromGeoJsonFile`: get a `FeaturesCollection` from a geojson file. Parameters:
 
 - `file`: the file to load, required
 - `nameProperty`: the property used for the geoserie name, automaticaly set if null
-- `verbose`: print data if true
+- `verbose`: print the parsed data if true
+
+## Reactive api
+
+Typed streams are available to retrieve the features as soon as they are parsed. Example: add assets on a Flutter map:
+
+```dart
+  import 'dart:math' as math;
+  import 'package:pedantic/pedantic.dart';
+  import 'package:flutter/services.dart' show rootBundle;
+  import 'package:geojson/geojson.dart';
+  import 'package:flutter_map/flutter_map.dart' as map;
+
+  /// Data for the Flutter map polylines layer
+  final lines = <map.Polyline>[];
+
+  Future<void> processData() async {
+    final data = await rootBundle
+        .loadString('assets/railroads_of_north_america.geojson');
+    final geojson = GeoJson();
+    geojson.processedLines.listen((Line line) {
+      final color = Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
+          .withOpacity(0.3);
+      setState(() => lines.add(map.Polyline(
+          strokeWidth: 2.0, color: color, points: line.geoSerie.toLatLng())));
+    });
+    geojson.endSignal.listen((_) => geojson.dispose());
+    unawaited(geojson.parse(data, verbose: true));
+  }
+```
+
+Check the examples for more details
+
+### Available streams:
+
+- `processedFeatures`: the parsed features: all the geometries
+- `processedPoints`: the parsed points
+- `processedMultipoints`: the parsed multipoints
+- `processedLines`: the parsed lines
+- `processedMultilines`: the parsed multilines
+- `processedPolygons`: the parsed polygons
+- `processedMultipolygons`: the parsed multipolygons
+- `endSignal`: parsing is finished indicator
 
 ## Supported geojson features
 
