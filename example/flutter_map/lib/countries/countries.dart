@@ -1,50 +1,65 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:pedantic/pedantic.dart';
+import 'package:geojson/geojson.dart';
+import 'package:geopoint/geopoint.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_map/flutter_map.dart' as map;
 import 'package:latlong/latlong.dart';
-import 'process_data.dart';
 
 class _CountriesPageState extends State<CountriesPage> {
-  final polygons = <Polygon>[];
-  bool ready = false;
+  final polygons = <map.Polygon>[];
 
   @override
   void initState() {
-    final proc = DataProcessor();
-    int numPoints = 0;
-    proc.run().then((_) {
-      proc.countries.forEach((name, polygon) {
-        polygons.add(polygon);
-        print("$name : ${polygon.points.length} points");
-        numPoints = numPoints + polygon.points.length;
-      });
-      setState(() => ready = true);
-      print("Points on map: $numPoints");
-    });
     super.initState();
+    processData();
+  }
+
+  Future<void> processData() async {
+    final geojson = GeoJson();
+    geojson.processedMultipolygons.listen((MultiPolygon multiPolygon) {
+      for (final polygon in multiPolygon.polygons) {
+        final geoSerie = GeoSerie(
+            type: GeoSerieType.polygon,
+            name: polygon.geoSeries[0].name,
+            geoPoints: <GeoPoint>[]);
+        for (final serie in polygon.geoSeries) {
+          geoSerie.geoPoints.addAll(serie.geoPoints);
+        }
+        final color =
+            Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
+                .withOpacity(0.3);
+        final poly = map.Polygon(
+            points: geoSerie.toLatLng(ignoreErrors: true), color: color);
+        setState(() => polygons.add(poly));
+      }
+    });
+    geojson.endSignal.listen((bool _) => geojson.dispose());
+    // The data is from https://datahub.io/core/geo-countries
+    final data = await rootBundle.loadString('assets/countries.geojson');
+    final nameProperty = "ADMIN";
+    unawaited(geojson.parse(data, nameProperty: nameProperty, verbose: true));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ready
-          ? FlutterMap(
-              mapController: MapController(),
-              options: MapOptions(
-                center: LatLng(51.0, 0.0),
-                zoom: 3.0,
-              ),
-              layers: [
-                TileLayerOptions(
-                    urlTemplate:
-                        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    subdomains: ['a', 'b', 'c']),
-                PolygonLayerOptions(
-                  polygons: polygons,
-                ),
-              ],
-            )
-          : const Center(child: CircularProgressIndicator()),
-    );
+        body: map.FlutterMap(
+      mapController: map.MapController(),
+      options: map.MapOptions(
+        center: LatLng(51.0, 0.0),
+        zoom: 1.0,
+      ),
+      layers: [
+        map.TileLayerOptions(
+            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            subdomains: ['a', 'b', 'c']),
+        map.PolygonLayerOptions(
+          polygons: polygons,
+        ),
+      ],
+    ));
   }
 }
 
