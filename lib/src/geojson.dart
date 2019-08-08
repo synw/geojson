@@ -25,7 +25,8 @@ class GeoJson {
         _processedLinesController = StreamController<Line>(),
         _processedMultilinesController = StreamController<MultiLine>(),
         _processedPolygonsController = StreamController<Polygon>(),
-        _processedMultipolygonsController = StreamController<MultiPolygon>();
+        _processedMultipolygonsController = StreamController<MultiPolygon>(),
+        _endSignalController = StreamController<bool>();
 
   /// All the features
   List<Feature> features;
@@ -55,6 +56,7 @@ class GeoJson {
   StreamController<MultiLine> _processedMultilinesController;
   StreamController<Polygon> _processedPolygonsController;
   StreamController<MultiPolygon> _processedMultipolygonsController;
+  StreamController<bool> _endSignalController;
 
   /// Stream of features that are coming in as they are parsed
   /// Useful for handing the featues faster if the file is big
@@ -80,6 +82,10 @@ class GeoJson {
   /// Stream of multipolygons that are coming in as they are parsed
   Stream<MultiPolygon> get processedMultipolygons =>
       _processedMultipolygonsController.stream;
+
+  /// The stream indicating that the parsing is finished
+  /// Use it to dispose the class if not needed anymore after parsing
+  Stream<bool> get endSignal => _endSignalController.stream;
 
   /// Parse the data from a file
   Future<void> parseFile(String path,
@@ -151,6 +157,7 @@ class GeoJson {
         data: data, nameProperty: nameProperty, verbose: verbose);
     unawaited(iso.run(<dynamic>[dataToProcess]));
     await finished.future;
+    _endSignalController.sink.add(true);
   }
 
   /// Dispose the class when finished using it
@@ -162,6 +169,7 @@ class GeoJson {
     _processedMultilinesController.close();
     _processedPolygonsController.close();
     _processedMultipointsController.close();
+    _endSignalController.close();
   }
 
   static void _processFeatures(IsoRunner iso) {
