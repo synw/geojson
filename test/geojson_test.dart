@@ -62,7 +62,7 @@ void main() {
   test("wrongfile", () async {
     expect(
         () async => await featuresFromGeoJsonFile(File("test/wrong.geojson")),
-        throwsA("File test/wrong.geojson does not exist"));
+        throwsA("The file test/wrong.geojson does not exist"));
   });
 
   test("unreadablefile", () async {
