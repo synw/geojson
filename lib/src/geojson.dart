@@ -194,7 +194,7 @@ class GeoJson {
       final geomType = geometry["type"].toString();
       GeoJsonFeature feature;
       switch (geomType) {
-        case "GeoJsonMultiPolygon":
+        case "MultiPolygon":
           feature = GeoJsonFeature<GeoJsonMultiPolygon>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.multipolygon;
@@ -203,7 +203,7 @@ class GeoJson {
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
-        case "GeoJsonPolygon":
+        case "Polygon":
           feature = GeoJsonFeature<GeoJsonPolygon>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.polygon;
@@ -230,7 +230,7 @@ class GeoJson {
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
-        case "GeoJsonMultiPoint":
+        case "MultiPoint":
           feature = GeoJsonFeature<GeoJsonMultiPoint>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.multipoint;
@@ -239,7 +239,7 @@ class GeoJson {
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
-        case "GeoJsonPoint":
+        case "Point":
           feature = GeoJsonFeature<GeoJsonPoint>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.point;
