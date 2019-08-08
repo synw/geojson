@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:geojson/src/exceptions.dart';
 import "package:test/test.dart";
 import "package:geojson/geojson.dart";
@@ -10,8 +9,8 @@ void main() {
     final features = await featuresFromGeoJson(geojsonPoint);
     expect(features.collection.length, 1);
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.point);
-    final point = feature.geometry as Point;
+    expect(feature.type, GeoJsonFeatureType.point);
+    final point = feature.geometry as GeoJsonPoint;
     expect(point.geoPoint.latitude, 0);
     expect(point.geoPoint.longitude, 0);
     expect(point.name, "point");
@@ -20,8 +19,8 @@ void main() {
   test("multipoint", () async {
     final features = await featuresFromGeoJson(geojsonMultiPoint);
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.multipoint);
-    final multipoint = feature.geometry as MultiPoint;
+    expect(feature.type, GeoJsonFeatureType.multipoint);
+    final multipoint = feature.geometry as GeoJsonMultiPoint;
     expect(multipoint.geoSerie.geoPoints.length, 2);
   });
 
@@ -29,8 +28,8 @@ void main() {
     final features =
         await featuresFromGeoJson(geojsonLine, nameProperty: "nameprop");
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.line);
-    final line = feature.geometry as Line;
+    expect(feature.type, GeoJsonFeatureType.line);
+    final line = feature.geometry as GeoJsonLine;
     expect(line.geoSerie.geoPoints.length, 2);
     expect(line.name, "line");
   });
@@ -38,24 +37,24 @@ void main() {
   test("multiline", () async {
     final features = await featuresFromGeoJson(geojsonMultiLine);
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.multiline);
-    final multiLine = feature.geometry as MultiLine;
+    expect(feature.type, GeoJsonFeatureType.multiline);
+    final multiLine = feature.geometry as GeoJsonMultiLine;
     expect(multiLine.lines.length, 4);
   });
 
   test("polygon", () async {
     final features = await featuresFromGeoJson(geojsonPolygon);
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.polygon);
-    final polygon = feature.geometry as Polygon;
+    expect(feature.type, GeoJsonFeatureType.polygon);
+    final polygon = feature.geometry as GeoJsonPolygon;
     expect(polygon.geoSeries[0].geoPoints.length, 3);
   });
 
   test("multipolygon", () async {
     final features = await featuresFromGeoJson(geojsonMultiPolygon);
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.multipolygon);
-    final multipolygon = feature.geometry as MultiPolygon;
+    expect(feature.type, GeoJsonFeatureType.multipolygon);
+    final multipolygon = feature.geometry as GeoJsonMultiPolygon;
     expect(multipolygon.polygons.length, 3);
   });
 
@@ -77,8 +76,8 @@ void main() {
     final features = await featuresFromGeoJsonFile(File("test/data.geojson"));
     expect(features.collection.length, 1);
     final feature = features.collection[0];
-    expect(feature.type, FeatureType.point);
-    final point = feature.geometry as Point;
+    expect(feature.type, GeoJsonFeatureType.point);
+    final point = feature.geometry as GeoJsonPoint;
     expect(point.geoPoint.latitude, 0);
     expect(point.geoPoint.longitude, 0);
     expect(point.name, "point");
