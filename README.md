@@ -11,13 +11,13 @@ Note: the data is parsed in an isolate to avoid slowing down the main thread
 
 ## Simple functions
 
-`featuresFromGeoJson`: get a `FeaturesCollection` from geojson string data. Parameters:
+**[featuresFromGeoJson](https://pub.dev/documentation/geojson/latest/geojson/featuresFromGeoJson.html)**: get a [FeaturesCollection](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonFeatureCollection-class.html) from geojson string data. Parameters:
 
 - `data`: a string with the geojson data, required
 - `nameProperty`: the property used for the geoserie name, automaticaly set if null
 - `verbose`: print the parsed data if true
 
-`featuresFromGeoJsonFile`: get a `FeaturesCollection` from a geojson file. Parameters:
+**[featuresFromGeoJsonFile](https://pub.dev/documentation/geojson/latest/geojson/featuresFromGeoJsonFile.html)**: get a [FeaturesCollection](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonFeatureCollection-class.html) from a geojson file. Parameters:
 
 - `file`: the file to load, required
 - `nameProperty`: the property used for the geoserie name, automaticaly set if null
@@ -32,19 +32,19 @@ Typed streams are available to retrieve the features as soon as they are parsed.
   import 'package:pedantic/pedantic.dart';
   import 'package:flutter/services.dart' show rootBundle;
   import 'package:geojson/geojson.dart';
-  import 'package:flutter_map/flutter_map.dart' as map;
+  import 'package:flutter_map/flutter_map.dart';
 
   /// Data for the Flutter map polylines layer
-  final lines = <map.Polyline>[];
+  final lines = <Polyline>[];
 
-  Future<void> processData() async {
+  Future<void> parseAndDrawAssetsOnMap() async {
     final data = await rootBundle
         .loadString('assets/railroads_of_north_america.geojson');
     final geojson = GeoJson();
-    geojson.processedLines.listen((Line line) {
+    geojson.processedLines.listen((GeoJsonLine line) {
       final color = Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
           .withOpacity(0.3);
-      setState(() => lines.add(map.Polyline(
+      setState(() => lines.add(Polyline(
           strokeWidth: 2.0, color: color, points: line.geoSerie.toLatLng())));
     });
     geojson.endSignal.listen((_) => geojson.dispose());
@@ -54,7 +54,7 @@ Typed streams are available to retrieve the features as soon as they are parsed.
 
 Check the examples for more details
 
-### Available streams:
+### Available streams
 
 - `processedFeatures`: the parsed features: all the geometries
 - `processedPoints`: the parsed points
@@ -67,47 +67,48 @@ Check the examples for more details
 
 ## Supported geojson features
 
-All the data structures use `GeoPoint` and `GeoSerie` from the [GeoPoint](https://github.com/synw/geopoint) package to store the geometry data. Data structures used:
+All the data structures use [GeoPoint](https://pub.dev/documentation/geopoint/latest/geopoint/GeoPoint-class.html) and [GeoSerie](https://pub.dev/documentation/geopoint/latest/geopoint/GeoSerie-class.html) from the [GeoPoint](https://github.com/synw/geopoint) package to store the geometry data. Data structures used:
 
-**FeatureCollection**:
+**[GeoJsonFeatureCollection](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonFeatureCollection-class.html)**:
 
 - `String` **name**
-- `List<Feature>` **collection**
+- `List<GeoJsonFeature>` **collection**
 
-**Feature**:
+**[GeoJsonFeature](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonFeature-class.html)**:
 
-- `FeatureType` **type**: one of `FeatureType.point`, `FeatureType.multipoint`, `FeatureType.line`, `FeatureType.multiline`, `FeatureType.polygon`, `FeatureType.multipolygon`
+- `GeoJsonFeatureType` **type**: [types](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonFeatureType-class.html)
+
 - `Map<String, dynamic>` **properties**: the json properties of the feature
 - `dynamic` **geometry**: the geometry data, depends on the feature type, see below
 
-**Point**:
+**[GeoJsonPoint](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonPoint-class.html)**:
 
 - `String` **name**
 - `GeoPoint` **geoPoint**: the geometry data
 
-**MultiPoint**:
+**[GeoJsonMultiPoint](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonMultiPoint-class.html)**:
 
 - `String` **name**
 - `GeoSerie` **geoSerie**: the geometry data: this will produce a geoSerie of type `GeoSerieType.group`
 
-**Line**:
+**[GeoJsonLine](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonLine-class.html)**:
 
 - `String` **name**
 - `GeoSerie` **geoSerie**: the geometry data: this will produce a geoSerie of type `GeoSerieType.line`
 
-**MultiLine**:
+**[GeoJsonMultiLine](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonMultiLine-class.html)**:
 
 - `String` **name**
-- `List<Line>` **lines**
+- `List<GeoJsonLine>` **lines**
 
-**Polygon**:
+**[GeoJsonPolygon](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonPolygon-class.html)**:
 
 - `String` **name**
 - `List<GeoSerie>` **geoSeries**: the geometry data: this will produce a list of geoSerie of type `GeoSerieType.polygon`*
 
-**MultiPolygon**:
+**[GeoJsonMultiPolygon](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonMultiPolygon-class.html)**:
 
 - `String` **name**
-- `List<Polygon>` **polygons**
+- `List<GeoJsonPolygon>` **polygons**
 
 Note: none of the parameters is final for all of these data structures
