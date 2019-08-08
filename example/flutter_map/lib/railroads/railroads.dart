@@ -2,12 +2,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_map/flutter_map.dart' as map;
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson/geojson.dart';
 import 'package:latlong/latlong.dart';
 
 class _RailroadsPageState extends State<RailroadsPage> {
-  final lines = <map.Polyline>[];
+  final lines = <Polyline>[];
 
   @override
   void initState() {
@@ -20,10 +20,10 @@ class _RailroadsPageState extends State<RailroadsPage> {
     final data = await rootBundle
         .loadString('assets/railroads_of_north_america.geojson');
     final geojson = GeoJson();
-    geojson.processedLines.listen((Line line) {
+    geojson.processedLines.listen((GeoJsonLine line) {
       final color = Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
           .withOpacity(0.3);
-      setState(() => lines.add(map.Polyline(
+      setState(() => lines.add(Polyline(
           strokeWidth: 2.0, color: color, points: line.geoSerie.toLatLng())));
     });
     geojson.endSignal.listen((_) => geojson.dispose());
@@ -33,17 +33,17 @@ class _RailroadsPageState extends State<RailroadsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: map.FlutterMap(
-      mapController: map.MapController(),
-      options: map.MapOptions(
+        body: FlutterMap(
+      mapController: MapController(),
+      options: MapOptions(
         center: LatLng(43.91941, -99.84619),
         zoom: 3.0,
       ),
       layers: [
-        map.TileLayerOptions(
+        TileLayerOptions(
             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
             subdomains: ['a', 'b', 'c']),
-        map.PolylineLayerOptions(polylines: lines),
+        PolylineLayerOptions(polylines: lines),
       ],
     ));
   }

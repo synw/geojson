@@ -4,11 +4,11 @@ import 'package:pedantic/pedantic.dart';
 import 'package:geojson/geojson.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_map/flutter_map.dart' as map;
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 
 class _CountriesPageState extends State<CountriesPage> {
-  final polygons = <map.Polygon>[];
+  final polygons = <Polygon>[];
 
   @override
   void initState() {
@@ -18,7 +18,7 @@ class _CountriesPageState extends State<CountriesPage> {
 
   Future<void> processData() async {
     final geojson = GeoJson();
-    geojson.processedMultipolygons.listen((MultiPolygon multiPolygon) {
+    geojson.processedMultipolygons.listen((GeoJsonMultiPolygon multiPolygon) {
       for (final polygon in multiPolygon.polygons) {
         final geoSerie = GeoSerie(
             type: GeoSerieType.polygon,
@@ -30,7 +30,7 @@ class _CountriesPageState extends State<CountriesPage> {
         final color =
             Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
                 .withOpacity(0.3);
-        final poly = map.Polygon(
+        final poly = Polygon(
             points: geoSerie.toLatLng(ignoreErrors: true), color: color);
         setState(() => polygons.add(poly));
       }
@@ -45,17 +45,17 @@ class _CountriesPageState extends State<CountriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: map.FlutterMap(
-      mapController: map.MapController(),
-      options: map.MapOptions(
+        body: FlutterMap(
+      mapController: MapController(),
+      options: MapOptions(
         center: LatLng(51.0, 0.0),
         zoom: 1.0,
       ),
       layers: [
-        map.TileLayerOptions(
+        TileLayerOptions(
             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
             subdomains: ['a', 'b', 'c']),
-        map.PolygonLayerOptions(
+        PolygonLayerOptions(
           polygons: polygons,
         ),
       ],

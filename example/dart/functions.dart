@@ -22,7 +22,7 @@ Future<void> multipolygons() async {
   final file = File("../data/lakes_of_europe.geojson");
   final features = await featuresFromGeoJsonFile(file, nameProperty: "label");
   for (final feature in features.collection) {
-    final geom = feature.geometry as MultiPolygon;
+    final geom = feature.geometry as GeoJsonMultiPolygon;
     for (final polygon in geom.polygons) {
       print("Polygon ${polygon.name}");
       for (final geoSerie in polygon.geoSeries) {
