@@ -1,7 +1,7 @@
 import 'package:geopoint/geopoint.dart';
 
 /// Geojson feature types
-enum FeatureType {
+enum GeoJsonFeatureType {
   /// A point
   point,
 
@@ -22,23 +22,23 @@ enum FeatureType {
 }
 
 /// A list of features
-class FeatureCollection {
+class GeoJsonFeatureCollection {
   /// Default constructor
-  FeatureCollection([this.collection]) {
-    collection ??= <Feature>[];
+  GeoJsonFeatureCollection([this.collection]) {
+    collection ??= <GeoJsonFeature>[];
   }
 
   /// A features collection
-  List<Feature> collection;
+  List<GeoJsonFeature> collection;
 
   /// The collection name
   String name;
 }
 
 /// A geojson feature
-class Feature<T> {
+class GeoJsonFeature<T> {
   /// The type of the feature
-  FeatureType type;
+  GeoJsonFeatureType type;
 
   /// The feature properties
   Map<String, dynamic> properties;
@@ -52,31 +52,31 @@ class Feature<T> {
   int _length() {
     int total = 0;
     switch (type) {
-      case FeatureType.point:
+      case GeoJsonFeatureType.point:
         total = 1;
         break;
-      case FeatureType.multipoint:
-        final g = geometry as MultiPoint;
+      case GeoJsonFeatureType.multipoint:
+        GeoJsonMultiPoint g = geometry as GeoJsonMultiPoint;
         total = g.geoSerie.geoPoints.length;
         break;
-      case FeatureType.line:
-        final g = geometry as Line;
+      case GeoJsonFeatureType.line:
+        final g = geometry as GeoJsonLine;
         total = g.geoSerie.geoPoints.length;
         break;
-      case FeatureType.multiline:
-        final g = geometry as MultiLine;
+      case GeoJsonFeatureType.multiline:
+        final g = geometry as GeoJsonMultiLine;
         for (final line in g.lines) {
           total = total + line.geoSerie.geoPoints.length;
         }
         break;
-      case FeatureType.polygon:
-        final g = geometry as Polygon;
+      case GeoJsonFeatureType.polygon:
+        final g = geometry as GeoJsonPolygon;
         for (final geoSerie in g.geoSeries) {
           total = total + geoSerie.geoPoints.length;
         }
         break;
-      case FeatureType.multipolygon:
-        final g = geometry as MultiPolygon;
+      case GeoJsonFeatureType.multipolygon:
+        final g = geometry as GeoJsonMultiPolygon;
         for (final polygon in g.polygons) {
           for (final geoSerie in polygon.geoSeries) {
             total = total + geoSerie.geoPoints.length;
@@ -89,9 +89,9 @@ class Feature<T> {
 }
 
 /// A point
-class Point {
+class GeoJsonPoint {
   /// Default constructor
-  Point({this.geoPoint, this.name});
+  GeoJsonPoint({this.geoPoint, this.name});
 
   /// The geometry data
   GeoPoint geoPoint;
@@ -101,9 +101,9 @@ class Point {
 }
 
 /// Multiple points
-class MultiPoint {
+class GeoJsonMultiPoint {
   /// Default constructor
-  MultiPoint({this.geoSerie, this.name});
+  GeoJsonMultiPoint({this.geoSerie, this.name});
 
   /// The geometry data
   GeoSerie geoSerie;
@@ -113,9 +113,9 @@ class MultiPoint {
 }
 
 /// A line
-class Line {
+class GeoJsonLine {
   /// Default constructor
-  Line({this.geoSerie, this.name});
+  GeoJsonLine({this.geoSerie, this.name});
 
   /// The geometry data
   GeoSerie geoSerie;
@@ -125,23 +125,23 @@ class Line {
 }
 
 /// A multiline
-class MultiLine {
+class GeoJsonMultiLine {
   /// Default constructor
-  MultiLine({this.lines, this.name}) {
-    lines ??= <Line>[];
+  GeoJsonMultiLine({this.lines, this.name}) {
+    lines ??= <GeoJsonLine>[];
   }
 
   /// The geometry data
-  List<Line> lines;
+  List<GeoJsonLine> lines;
 
   /// The name of the line
   String name;
 }
 
 /// A polygon
-class Polygon {
+class GeoJsonPolygon {
   /// Default constructor
-  Polygon({this.geoSeries, this.name}) {
+  GeoJsonPolygon({this.geoSeries, this.name}) {
     geoSeries ??= <GeoSerie>[];
   }
 
@@ -153,15 +153,40 @@ class Polygon {
 }
 
 /// A multipolygon
-class MultiPolygon {
+class GeoJsonMultiPolygon {
   /// Default constructor
-  MultiPolygon({this.polygons, this.name}) {
-    polygons ??= <Polygon>[];
+  GeoJsonMultiPolygon({this.polygons, this.name}) {
+    polygons ??= <GeoJsonPolygon>[];
   }
 
   /// The geometry data
-  List<Polygon> polygons;
+  List<GeoJsonPolygon> polygons;
 
   /// The name of the multipolygon
   String name;
 }
+/*
+/// Old depreccated name
+@deprecated
+final GeoJsonPoint = GeoJsonPoint;
+
+/// Old depreccated name
+@deprecated
+final GeoJsonMultiPoint = GeoJsonMultiPoint;
+
+/// Old depreccated name
+@deprecated
+final GeoJsonLine = GeoJsonLine;
+
+/// Old depreccated name
+@deprecated
+final GeoJsonMultiLine = GeoJsonMultiLine;
+
+/// Old depreccated name
+@deprecated
+final GeoJsonPolygon = GeoJsonPolygon;
+
+/// Old depreccated name
+@deprecated
+final GeoJsonMultiPolygon = GeoJsonMultiPolygon;
+*/

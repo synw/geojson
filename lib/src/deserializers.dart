@@ -2,9 +2,9 @@ import 'package:geopoint/geopoint.dart';
 import 'models.dart';
 
 /// Get a point from coordinates and feature
-Point getPoint(
-    {List<dynamic> coordinates, Feature feature, String nameProperty}) {
-  final point = Point();
+GeoJsonPoint getPoint(
+    {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
+  final point = GeoJsonPoint();
   final name = _getName(feature: feature, nameProperty: nameProperty);
   final geoPoint = _getGeoPoints(<dynamic>[coordinates])[0];
   geoPoint.name = name;
@@ -14,9 +14,9 @@ Point getPoint(
 }
 
 /// Get multi points from coordinates and feature
-MultiPoint getMultiPoint(
-    {List<dynamic> coordinates, Feature feature, String nameProperty}) {
-  final multiPoint = MultiPoint();
+GeoJsonMultiPoint getMultiPoint(
+    {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
+  final multiPoint = GeoJsonMultiPoint();
   final name = _getName(feature: feature, nameProperty: nameProperty);
   multiPoint.name = name;
   final geoSerie = GeoSerie(
@@ -28,9 +28,9 @@ MultiPoint getMultiPoint(
 }
 
 /// Get a line from coordinates and feature
-Line getLine(
-    {List<dynamic> coordinates, Feature feature, String nameProperty}) {
-  final line = Line();
+GeoJsonLine getLine(
+    {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
+  final line = GeoJsonLine();
   final name = _getName(feature: feature, nameProperty: nameProperty);
   line.name = name;
   final geoSerie = GeoSerie(
@@ -42,13 +42,13 @@ Line getLine(
 }
 
 /// Get a multi line from coordinates and feature
-MultiLine getMultiLine(
-    {List<dynamic> coordinates, Feature feature, String nameProperty}) {
+GeoJsonMultiLine getMultiLine(
+    {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
   final name = _getName(feature: feature, nameProperty: nameProperty);
-  final multiLine = MultiLine(name: name);
+  final multiLine = GeoJsonMultiLine(name: name);
   int i = 1;
   for (final coords in coordinates) {
-    final line = Line();
+    final line = GeoJsonLine();
     line.name =
         _getName(feature: feature, nameProperty: nameProperty, index: i);
     final geoSerie = GeoSerie(
@@ -63,9 +63,9 @@ MultiLine getMultiLine(
 }
 
 /// Get a polygon from coordinates and feature
-Polygon getPolygon(
-    {List<dynamic> coordinates, Feature feature, String nameProperty}) {
-  final polygon = Polygon();
+GeoJsonPolygon getPolygon(
+    {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
+  final polygon = GeoJsonPolygon();
   final name = _getName(feature: feature, nameProperty: nameProperty);
   polygon.name = name;
   for (final coords in coordinates) {
@@ -79,13 +79,13 @@ Polygon getPolygon(
 }
 
 /// Get a multipolygon from coordinates and feature
-MultiPolygon getMultipolygon(
-    {List<dynamic> coordinates, Feature feature, String nameProperty}) {
-  final multiPolygon = MultiPolygon();
+GeoJsonMultiPolygon getMultipolygon(
+    {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
+  final multiPolygon = GeoJsonMultiPolygon();
   int i = 1;
   multiPolygon.name = _getName(feature: feature, nameProperty: nameProperty);
   for (final coordsL2 in coordinates) {
-    final polygon = Polygon();
+    final polygon = GeoJsonPolygon();
     final name =
         _getName(feature: feature, nameProperty: nameProperty, index: i);
     polygon.name = name;
@@ -102,7 +102,7 @@ MultiPolygon getMultipolygon(
   return multiPolygon;
 }
 
-String _getName({Feature feature, String nameProperty, int index}) {
+String _getName({GeoJsonFeature feature, String nameProperty, int index}) {
   String name;
   if (nameProperty != null) {
     name = feature.properties[nameProperty].toString();

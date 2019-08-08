@@ -12,75 +12,78 @@ import 'exceptions.dart';
 class GeoJson {
   /// Default constructor
   GeoJson()
-      : features = <Feature>[],
-        points = <Point>[],
-        multipoints = <MultiPoint>[],
-        lines = <Line>[],
-        multilines = <MultiLine>[],
-        polygons = <Polygon>[],
-        multipolygons = <MultiPolygon>[],
-        _processedFeaturesController = StreamController<Feature>(),
-        _processedPointsController = StreamController<Point>(),
-        _processedMultipointsController = StreamController<MultiPoint>(),
-        _processedLinesController = StreamController<Line>(),
-        _processedMultilinesController = StreamController<MultiLine>(),
-        _processedPolygonsController = StreamController<Polygon>(),
-        _processedMultipolygonsController = StreamController<MultiPolygon>(),
+      : features = <GeoJsonFeature>[],
+        points = <GeoJsonPoint>[],
+        multipoints = <GeoJsonMultiPoint>[],
+        lines = <GeoJsonLine>[],
+        multilines = <GeoJsonMultiLine>[],
+        polygons = <GeoJsonPolygon>[],
+        multipolygons = <GeoJsonMultiPolygon>[],
+        _processedFeaturesController = StreamController<GeoJsonFeature>(),
+        _processedPointsController = StreamController<GeoJsonPoint>(),
+        _processedMultipointsController = StreamController<GeoJsonMultiPoint>(),
+        _processedLinesController = StreamController<GeoJsonLine>(),
+        _processedMultilinesController = StreamController<GeoJsonMultiLine>(),
+        _processedPolygonsController = StreamController<GeoJsonPolygon>(),
+        _processedMultipolygonsController =
+            StreamController<GeoJsonMultiPolygon>(),
         _endSignalController = StreamController<bool>();
 
   /// All the features
-  List<Feature> features;
+  List<GeoJsonFeature> features;
 
   /// All the points
-  List<Point> points;
+  List<GeoJsonPoint> points;
 
   /// All the multipoints
-  List<MultiPoint> multipoints;
+  List<GeoJsonMultiPoint> multipoints;
 
   /// All the lines
-  List<Line> lines;
+  List<GeoJsonLine> lines;
 
   /// All the multilines
-  List<MultiLine> multilines;
+  List<GeoJsonMultiLine> multilines;
 
   /// All the polygons
-  List<Polygon> polygons;
+  List<GeoJsonPolygon> polygons;
 
   /// All the multipolygons
-  List<MultiPolygon> multipolygons;
+  List<GeoJsonMultiPolygon> multipolygons;
 
-  StreamController<Feature> _processedFeaturesController;
-  StreamController<Point> _processedPointsController;
-  StreamController<MultiPoint> _processedMultipointsController;
-  StreamController<Line> _processedLinesController;
-  StreamController<MultiLine> _processedMultilinesController;
-  StreamController<Polygon> _processedPolygonsController;
-  StreamController<MultiPolygon> _processedMultipolygonsController;
+  StreamController<GeoJsonFeature> _processedFeaturesController;
+  StreamController<GeoJsonPoint> _processedPointsController;
+  StreamController<GeoJsonMultiPoint> _processedMultipointsController;
+  StreamController<GeoJsonLine> _processedLinesController;
+  StreamController<GeoJsonMultiLine> _processedMultilinesController;
+  StreamController<GeoJsonPolygon> _processedPolygonsController;
+  StreamController<GeoJsonMultiPolygon> _processedMultipolygonsController;
   StreamController<bool> _endSignalController;
 
   /// Stream of features that are coming in as they are parsed
   /// Useful for handing the featues faster if the file is big
-  Stream<Feature> get processedFeatures => _processedFeaturesController.stream;
+  Stream<GeoJsonFeature> get processedFeatures =>
+      _processedFeaturesController.stream;
 
   /// Stream of points that are coming in as they are parsed
-  Stream<Point> get processedPoints => _processedPointsController.stream;
+  Stream<GeoJsonPoint> get processedPoints => _processedPointsController.stream;
 
   /// Stream of multipoints that are coming in as they are parsed
-  Stream<MultiPoint> get processedMultipoints =>
+  Stream<GeoJsonMultiPoint> get processedMultipoints =>
       _processedMultipointsController.stream;
 
   /// Stream of lines that are coming in as they are parsed
-  Stream<Line> get processedLines => _processedLinesController.stream;
+  Stream<GeoJsonLine> get processedLines => _processedLinesController.stream;
 
   /// Stream of multilines that are coming in as they are parsed
-  Stream<MultiLine> get processedMultilines =>
+  Stream<GeoJsonMultiLine> get processedMultilines =>
       _processedMultilinesController.stream;
 
   /// Stream of polygons that are coming in as they are parsed
-  Stream<Polygon> get processedPolygons => _processedPolygonsController.stream;
+  Stream<GeoJsonPolygon> get processedPolygons =>
+      _processedPolygonsController.stream;
 
   /// Stream of multipolygons that are coming in as they are parsed
-  Stream<MultiPolygon> get processedMultipolygons =>
+  Stream<GeoJsonMultiPolygon> get processedMultipolygons =>
       _processedMultipolygonsController.stream;
 
   /// The stream indicating that the parsing is finished
@@ -111,35 +114,35 @@ class GeoJson {
     final finished = Completer<Null>();
     Iso iso;
     iso = Iso(_processFeatures, onDataOut: (dynamic data) {
-      if (data is Feature) {
+      if (data is GeoJsonFeature) {
         switch (data.type) {
-          case FeatureType.point:
-            final item = data.geometry as Point;
+          case GeoJsonFeatureType.point:
+            final item = data.geometry as GeoJsonPoint;
             points.add(item);
             _processedPointsController.sink.add(item);
             break;
-          case FeatureType.multipoint:
-            final item = data.geometry as MultiPoint;
+          case GeoJsonFeatureType.multipoint:
+            final item = data.geometry as GeoJsonMultiPoint;
             multipoints.add(item);
             _processedMultipointsController.sink.add(item);
             break;
-          case FeatureType.line:
-            final item = data.geometry as Line;
+          case GeoJsonFeatureType.line:
+            final item = data.geometry as GeoJsonLine;
             lines.add(item);
             _processedLinesController.sink.add(item);
             break;
-          case FeatureType.multiline:
-            final item = data.geometry as MultiLine;
+          case GeoJsonFeatureType.multiline:
+            final item = data.geometry as GeoJsonMultiLine;
             multilines.add(item);
             _processedMultilinesController.sink.add(item);
             break;
-          case FeatureType.polygon:
-            final item = data.geometry as Polygon;
+          case GeoJsonFeatureType.polygon:
+            final item = data.geometry as GeoJsonPolygon;
             polygons.add(item);
             _processedPolygonsController.sink.add(item);
             break;
-          case FeatureType.multipolygon:
-            final item = data.geometry as MultiPolygon;
+          case GeoJsonFeatureType.multipolygon:
+            final item = data.geometry as GeoJsonMultiPolygon;
             multipolygons.add(item);
             _processedMultipolygonsController.sink.add(item);
         }
@@ -189,57 +192,57 @@ class GeoJson {
       }
       final geometry = feat["geometry"] as Map<String, dynamic>;
       final geomType = geometry["type"].toString();
-      Feature feature;
+      GeoJsonFeature feature;
       switch (geomType) {
-        case "MultiPolygon":
-          feature = Feature<MultiPolygon>();
+        case "GeoJsonMultiPolygon":
+          feature = GeoJsonFeature<GeoJsonMultiPolygon>();
           feature.properties = properties;
-          feature.type = FeatureType.multipolygon;
+          feature.type = GeoJsonFeatureType.multipolygon;
           feature.geometry = getMultipolygon(
               feature: feature,
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
-        case "Polygon":
-          feature = Feature<Polygon>();
+        case "GeoJsonPolygon":
+          feature = GeoJsonFeature<GeoJsonPolygon>();
           feature.properties = properties;
-          feature.type = FeatureType.polygon;
+          feature.type = GeoJsonFeatureType.polygon;
           feature.geometry = getPolygon(
               feature: feature,
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
         case "MultiLineString":
-          feature = Feature<MultiLine>();
+          feature = GeoJsonFeature<GeoJsonMultiLine>();
           feature.properties = properties;
-          feature.type = FeatureType.multiline;
+          feature.type = GeoJsonFeatureType.multiline;
           feature.geometry = getMultiLine(
               feature: feature,
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
         case "LineString":
-          feature = Feature<Line>();
+          feature = GeoJsonFeature<GeoJsonLine>();
           feature.properties = properties;
-          feature.type = FeatureType.line;
+          feature.type = GeoJsonFeatureType.line;
           feature.geometry = getLine(
               feature: feature,
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
-        case "MultiPoint":
-          feature = Feature<MultiPoint>();
+        case "GeoJsonMultiPoint":
+          feature = GeoJsonFeature<GeoJsonMultiPoint>();
           feature.properties = properties;
-          feature.type = FeatureType.multipoint;
+          feature.type = GeoJsonFeatureType.multipoint;
           feature.geometry = getMultiPoint(
               feature: feature,
               nameProperty: nameProperty,
               coordinates: geometry["coordinates"] as List<dynamic>);
           break;
-        case "Point":
-          feature = Feature<Point>();
+        case "GeoJsonPoint":
+          feature = GeoJsonFeature<GeoJsonPoint>();
           feature.properties = properties;
-          feature.type = FeatureType.point;
+          feature.type = GeoJsonFeatureType.point;
           feature.geometry = getPoint(
               feature: feature,
               nameProperty: nameProperty,

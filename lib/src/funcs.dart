@@ -4,9 +4,9 @@ import 'geojson.dart';
 import 'models.dart';
 
 /// Get a feature collection from a geojson string
-Future<FeatureCollection> featuresFromGeoJson(String data,
+Future<GeoJsonFeatureCollection> featuresFromGeoJson(String data,
     {String nameProperty, bool verbose = false}) async {
-  final featureCollection = FeatureCollection();
+  final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
   await geojson.parse(data, nameProperty: nameProperty, verbose: verbose);
   for (final feature in geojson.features) {
@@ -17,9 +17,9 @@ Future<FeatureCollection> featuresFromGeoJson(String data,
 }
 
 /// Get a feature collection from a geojson file
-Future<FeatureCollection> featuresFromGeoJsonFile(File file,
+Future<GeoJsonFeatureCollection> featuresFromGeoJsonFile(File file,
     {String nameProperty, bool verbose = false}) async {
-  final featureCollection = FeatureCollection();
+  final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
   await geojson.parseFile(file.path,
       nameProperty: nameProperty, verbose: verbose);
