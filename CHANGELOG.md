@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+**Breaking change**: prefix all classes names by `GeoJson`
+
 ## 0.4.0
 
 Add a reactive api with streams to retrive features as soon as they are parsed
