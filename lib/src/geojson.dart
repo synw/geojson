@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:geopoint/geopoint.dart';
+import 'package:geodesy/geodesy.dart';
 import 'package:meta/meta.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:iso/iso.dart';
@@ -92,7 +94,7 @@ class GeoJson {
 
   /// Parse the data from a file
   Future<void> parseFile(String path,
-      {String nameProperty, bool verbose}) async {
+      {String nameProperty, bool verbose = false, GeoJsonQuery query}) async {
     final file = File(path);
     if (!file.existsSync()) {
       throw ("The file ${file.path} does not exist");
@@ -106,11 +108,18 @@ class GeoJson {
     if (verbose) {
       print("Parsing file ${file.path}");
     }
-    await parse(data, nameProperty: nameProperty, verbose: verbose);
+    await _parse(data,
+        nameProperty: nameProperty, verbose: verbose, query: query);
   }
 
   /// Parse the data
-  Future<void> parse(String data, {String nameProperty, bool verbose}) async {
+  Future<void> parse(String data,
+      {String nameProperty, bool verbose = false}) async {
+    return await _parse(data, nameProperty: nameProperty, verbose: verbose);
+  }
+
+  Future<void> _parse(String data,
+      {String nameProperty, bool verbose, GeoJsonQuery query}) async {
     final finished = Completer<Null>();
     Iso iso;
     iso = Iso(_processFeatures, onDataOut: (dynamic data) {
@@ -157,10 +166,56 @@ class GeoJson {
       throw (e);
     });
     final dataToProcess = _DataToProcess(
-        data: data, nameProperty: nameProperty, verbose: verbose);
+        data: data, nameProperty: nameProperty, verbose: verbose, query: query);
     unawaited(iso.run(<dynamic>[dataToProcess]));
     await finished.future;
     _endSignalController.sink.add(true);
+  }
+
+  /// Search a [GeoJsonFeature] by prpperty from a file
+  Future<void> searchInFile(String path,
+      {@required GeoJsonQuery query,
+      String nameProperty,
+      bool verbose = false}) async {
+    await parseFile(path,
+        nameProperty: nameProperty, verbose: verbose, query: query);
+  }
+
+  /// Search a [GeoJsonFeature] by prpperty.
+  ///
+  /// If the string data is not provided the existing features will be used
+  /// to search
+  Future<void> search(
+      {String data,
+      @required GeoJsonQuery query,
+      String nameProperty,
+      bool verbose = false}) async {
+    if (data == null && features.isEmpty) {
+      throw (ArgumentError("Provide data or parse some to run a search"));
+    }
+    if (data != null) {
+      await _parse(data,
+          nameProperty: nameProperty, verbose: verbose, query: query);
+    }
+  }
+
+  /// Find all the [GeoJsonPoint] located in a [GeoJsonPolygon]
+  /// from a list of points
+  Future<List<GeoJsonPoint>> geofence(
+      {@required GeoJsonPolygon polygon,
+      @required List<GeoJsonPoint> points}) async {
+    final geodesy = Geodesy();
+    final geoFencedPoints = <GeoJsonPoint>[];
+    for (final point in points) {
+      for (final geoSerie in polygon.geoSeries) {
+        if (geodesy.isGeoPointInPolygon(
+            point.geoPoint.toLatLng(ignoreErrors: true),
+            geoSerie.toLatLng(ignoreErrors: true))) {
+          geoFencedPoints.add(point);
+        }
+      }
+    }
+    return geoFencedPoints;
   }
 
   /// Dispose the class when finished using it
@@ -181,6 +236,7 @@ class GeoJson {
     final String data = dataToProcess.data;
     final String nameProperty = dataToProcess.nameProperty;
     final bool verbose = dataToProcess.verbose;
+    final GeoJsonQuery query = dataToProcess.query;
     final Map<String, dynamic> decoded =
         json.decode(data) as Map<String, dynamic>;
     final feats = decoded["features"] as List<dynamic>;
@@ -198,6 +254,13 @@ class GeoJson {
           feature = GeoJsonFeature<GeoJsonMultiPolygon>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.multipolygon;
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.multipolygon) {
+                continue;
+              }
+            }
+          }
           feature.geometry = getMultipolygon(
               feature: feature,
               nameProperty: nameProperty,
@@ -207,6 +270,13 @@ class GeoJson {
           feature = GeoJsonFeature<GeoJsonPolygon>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.polygon;
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.polygon) {
+                continue;
+              }
+            }
+          }
           feature.geometry = getPolygon(
               feature: feature,
               nameProperty: nameProperty,
@@ -216,6 +286,13 @@ class GeoJson {
           feature = GeoJsonFeature<GeoJsonMultiLine>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.multiline;
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.multiline) {
+                continue;
+              }
+            }
+          }
           feature.geometry = getMultiLine(
               feature: feature,
               nameProperty: nameProperty,
@@ -225,6 +302,13 @@ class GeoJson {
           feature = GeoJsonFeature<GeoJsonLine>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.line;
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.line) {
+                continue;
+              }
+            }
+          }
           feature.geometry = getLine(
               feature: feature,
               nameProperty: nameProperty,
@@ -234,6 +318,13 @@ class GeoJson {
           feature = GeoJsonFeature<GeoJsonMultiPoint>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.multipoint;
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.multipoint) {
+                continue;
+              }
+            }
+          }
           feature.geometry = getMultiPoint(
               feature: feature,
               nameProperty: nameProperty,
@@ -243,6 +334,13 @@ class GeoJson {
           feature = GeoJsonFeature<GeoJsonPoint>();
           feature.properties = properties;
           feature.type = GeoJsonFeatureType.point;
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.point) {
+                continue;
+              }
+            }
+          }
           feature.geometry = getPoint(
               feature: feature,
               nameProperty: nameProperty,
@@ -252,13 +350,47 @@ class GeoJson {
           final e = FeatureNotSupported(geomType);
           throw (e);
       }
+      if (query != null && properties != null) {
+        if (!_checkProperty(properties, query)) {
+          continue;
+        }
+      }
       iso.send(feature);
       if (verbose == true) {
-        print("${feature.geometry.name} ${feature.type} : " +
+        print("${feature.type} ${feature.geometry.name} : " +
             "${feature.length} points");
       }
     }
     iso.send("end");
+  }
+
+  static bool _checkProperty(
+      Map<String, dynamic> properties, GeoJsonQuery query) {
+    bool isPropertyOk = true;
+    if (query.property != null) {
+      if (properties.containsKey(query.property)) {
+        switch (query.searchType) {
+          case GeoSearchType.exact:
+            if (properties[query.property] != query.value) {
+              isPropertyOk = false;
+            }
+            break;
+          case GeoSearchType.startsWith:
+            final prop = properties[query.property] as String;
+            if (!prop.startsWith(query.value as String)) {
+              isPropertyOk = false;
+            }
+            break;
+          case GeoSearchType.contains:
+            final prop = properties[query.property] as String;
+            if (!prop.contains(query.value as String)) {
+              isPropertyOk = false;
+            }
+            break;
+        }
+      }
+    }
+    return isPropertyOk;
   }
 }
 
@@ -266,9 +398,11 @@ class _DataToProcess {
   _DataToProcess(
       {@required this.data,
       @required this.nameProperty,
-      @required this.verbose});
+      @required this.verbose,
+      @required this.query});
 
   final String data;
   final String nameProperty;
   final bool verbose;
+  final GeoJsonQuery query;
 }
