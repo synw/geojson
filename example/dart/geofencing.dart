@@ -13,6 +13,7 @@ Future<void> main(List<String> args) async {
   await geo.searchInFile("../flutter_map/assets/countries.geojson",
       query: GeoJsonQuery(
           geometryType: GeoJsonFeatureType.multipolygon,
+          matchCase: false,
           property: "ADMIN",
           value: countryName),
       nameProperty: "ADMIN",
@@ -21,21 +22,20 @@ Future<void> main(List<String> args) async {
     print("Country $countryName not found");
     return;
   }
-  final country = geo.multipolygons[0];
+  final country = geo.multipolygons;
   print("Loading airports");
-  geo.processedPoints.listen((GeoJsonPoint point) {});
-  await geo.parseFile("../data/airports.geojson");
+  await geo.parseFile("../flutter_map/assets/airports.geojson",
+      disableStream: true);
   final airports = geo.points;
   print("Loaded ${airports.length} airports");
   print("Geofencing airports in $countryName");
   print("Airports in $countryName:");
-  final foundAirports = <GeoJsonPoint>[];
-  for (final polygon in country.polygons) {
-    final found = await geo.geofence(polygon: polygon, points: airports);
-    foundAirports.addAll(found);
-    for (final airport in found) {
-      print("  - ${airport.name}");
+  geo.processedPoints.listen((GeoJsonPoint point) {
+    print("  - ${point.name}");
+  });
+  for (final countryPolygons in country) {
+    for (final polygon in countryPolygons.polygons) {
+      await geo.geofencePolygon(polygon: polygon, points: airports);
     }
   }
-  print("Found ${foundAirports.length} airports in $countryName");
 }

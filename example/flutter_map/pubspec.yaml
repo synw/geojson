@@ -20,6 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_map: ^0.7.0+2
+  rxdart: ^0.22.1+1
   geojson:
     path: ../../
 
@@ -47,6 +48,7 @@ flutter:
   assets:
     - assets/railroads_of_north_america.geojson
     - assets/countries.geojson
+    - assets/airports.geojson
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

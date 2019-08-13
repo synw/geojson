@@ -10,15 +10,25 @@ class IndexPage extends StatelessWidget {
           children: <Widget>[
             MainButton(
               icon: Icons.collections,
-              text: "Countries of the world. Warning: " +
+              text: "Polygons: countries of the world. Warning: " +
                   "this could be slow on low end devices",
               link: "/countries",
             ),
             MainButton(
               icon: Icons.directions_railway,
-              text: "Railroads",
+              text: "Lines: railroads",
               link: "/railroads",
-            )
+            ),
+            MainButton(
+              icon: Icons.location_searching,
+              text: "Geofencing: airports in country",
+              link: "/airports",
+            ),
+            MainButton(
+              icon: Icons.airplanemode_active,
+              text: "Geofencing: nearby airports",
+              link: "/nearby_airports",
+            ),
           ]),
     );
   }
@@ -36,7 +46,7 @@ class MainButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Column(children: <Widget>[
-        Icon(icon, size: 85.0, color: Colors.grey),
+        Icon(icon, size: 55.0, color: Colors.grey),
         Padding(
           padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 20.0),
           child: Text(text,
