@@ -33,7 +33,7 @@ Future<void> multipolygons() async {
 }
 
 Future<void> lines() async {
-  final file = File("../data/railroads_of_north_america.geojson");
+  final file = File("../flutter_map/assets/railroads_of_north_america.geojson");
   final features = await featuresFromGeoJsonFile(file);
   for (final feature in features.collection) {
     print("${feature.geometry.geoSerie.name}: " +

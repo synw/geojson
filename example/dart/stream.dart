@@ -1,13 +1,14 @@
 import 'package:geojson/geojson.dart';
 
 void main() {
-  smallData();
+  parse();
 }
 
-Future<void> smallData() async {
+Future<void> parse() async {
   final geojson = GeoJson();
-  geojson.processedPoints.listen((GeoJsonPoint point) {
-    print("Point: ${point.geoPoint}");
+  geojson.processedMultipolygons.listen((GeoJsonMultiPolygon multiPolygon) {
+    print("${multiPolygon.name}: ${multiPolygon.polygons.length} polygon(s)");
   });
-  await geojson.parseFile("../data/small_data.geojson", verbose: true);
+  await geojson.parseFile("../flutter_map/assets/countries.geojson",
+      nameProperty: "ADMIN");
 }
