@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Add search methods
+- Add geofencing methods
+- Add serializers
+
 ## 0.5.0
 
 **Breaking change**: prefix all classes names by `GeoJson`
