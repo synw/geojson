@@ -4,8 +4,9 @@
 
 Utilities to work with geojson data in Dart. Features:
 
-- **Parser**: simple functions are available to parse geojson
-- **Reactive api**: streams are available to retrieve the geojson features as soon as they are parsed
+- **Parser** with a **reactive api**: streams are available to retrieve the geojson features as soon as they are parsed
+- **Search**: search for properties
+- **Geofencing**: geofence points in a polygon or from a distance
 
 Note: the data is parsed in an isolate to avoid slowing down the main thread
 
@@ -64,6 +65,50 @@ Check the examples for more details
 - `processedPolygons`: the parsed polygons
 - `processedMultipolygons`: the parsed multipolygons
 - `endSignal`: parsing is finished indicator
+
+## Search
+
+Search in  a geojson file:
+
+```dart
+final geo = GeoJson();
+await geo.searchInFile("countries.geojson",
+    query: GeoJsonQuery(
+        geometryType: GeoJsonFeatureType.multipolygon,
+        matchCase: false,
+        property: "name",
+        value: "Zimbabwe"),
+    verbose: true);
+List<GeoJsonMultiPolygon> result = geo.multipolygons;
+```
+
+A `search` method is also available, taking string data in parameter instead of a file path. The streams are available to retrieve the data as soon as it is found
+
+## Geofencing
+
+Geofence points within a distance of a given point:
+
+   ```dart
+   final geo = GeoJson();
+   /// `point` is the [GeoJsonPoint] to search from
+   /// `points` is the list of [GeoJsonPoint] to search in
+   /// `distance` is the distance to search in meters
+   await geo.geofenceDistance(
+         point: point, points: points, distance: distance);
+    List<GeoPoint> foundPoints = geo.points;
+   ```
+
+Geofence points in a polygon:
+
+   ```dart
+   final geo = GeoJson();
+   /// `polygon` is the [GeoJsonPolygon] to check
+   /// `points` is the list of [GeoJsonPoint] to search in
+   await geo.geofencePolygon(polygon: polygon, points: points);
+    List<GeoPoint> foundPoints = geo.points;
+   ```
+
+Note: the `processedPoints` stream is available to retrieve geofenced points as soon as they are found
 
 ## Supported geojson features
 
