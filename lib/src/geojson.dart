@@ -233,18 +233,52 @@ class GeoJson {
   Future<List<GeoJsonPoint>> geofenceDistance(
       {@required GeoJsonPoint point,
       @required List<GeoJsonPoint> points,
-      @required num distance}) async {
-    final geoFencedPoints = <GeoJsonPoint>[];
+      @required num distance,
+      bool disableStream = false,
+      bool verbose = false}) async {
+    final foundPoints = <GeoJsonPoint>[];
+    final finished = Completer<Null>();
+    Iso iso;
+    iso = Iso(_geoFenceDistanceRunner, onDataOut: (dynamic data) {
+      if (data is GeoJsonPoint) {
+        final point = data;
+        foundPoints.add(point);
+        if (!disableStream) {
+          _processedPointsController.sink.add(point);
+        }
+      } else {
+        iso.dispose();
+        finished.complete();
+      }
+    }, onError: (dynamic e) {
+      throw (e);
+    });
+    final dataToProcess = _GeoFenceDistanceToProcess(
+        points: points, point: point, distance: distance, verbose: verbose);
+    unawaited(iso.run(<dynamic>[dataToProcess]));
+    await finished.future;
+    return foundPoints;
+  }
+
+  static Future<void> _geoFenceDistanceRunner(IsoRunner iso) async {
+    final List<dynamic> args = iso.args;
+    final dataToProcess = args[0] as _GeoFenceDistanceToProcess;
+    final points = dataToProcess.points;
+    final distance = dataToProcess.distance;
+    final point = dataToProcess.point;
+    final verbose = dataToProcess.verbose;
     final geodesy = Geodesy();
     for (final p in points) {
       final distanceFromCenter = geodesy.distanceBetweenTwoGeoPoints(
           point.geoPoint.toLatLng(), p.geoPoint.toLatLng());
       if (distanceFromCenter <= distance) {
-        geoFencedPoints.add(p);
-        _processedPointsController.add(p);
+        if (verbose) {
+          print("${p.name}");
+        }
+        iso.send(p);
       }
     }
-    return geoFencedPoints;
+    iso.send("end");
   }
 
   /// Find all the [GeoJsonPoint] located in a [GeoJsonPolygon]
@@ -502,4 +536,17 @@ class _GeoFenceToProcess {
   final bool verbose;
   final GeoJsonPolygon polygon;
   final List<GeoJsonPoint> points;
+}
+
+class _GeoFenceDistanceToProcess {
+  _GeoFenceDistanceToProcess(
+      {@required this.points,
+      @required this.point,
+      @required this.distance,
+      @required this.verbose});
+
+  final bool verbose;
+  final num distance;
+  final List<GeoJsonPoint> points;
+  final GeoJsonPoint point;
 }
