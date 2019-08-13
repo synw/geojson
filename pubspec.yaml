@@ -9,11 +9,11 @@ environment:
 
 dependencies:
   meta: ^1.1.6
-  geopoint:
-    path: ../geopoint
+  geopoint: ^0.5.0
   iso: ^0.2.3
   pedantic: ^1.6.0
-  geodesy: ^0.3.0
+  geodesy: ^0.3.1
+  rxdart: ^0.22.1+1
 
 dev_dependencies:
   test: ^1.6.5
