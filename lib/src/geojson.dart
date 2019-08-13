@@ -270,7 +270,7 @@ class GeoJson {
     final geodesy = Geodesy();
     for (final p in points) {
       final distanceFromCenter = geodesy.distanceBetweenTwoGeoPoints(
-          point.geoPoint.toLatLng(), p.geoPoint.toLatLng());
+          point.geoPoint.point, p.geoPoint.point);
       if (distanceFromCenter <= distance) {
         if (verbose) {
           print("${p.name}");
