@@ -1,5 +1,5 @@
 name: geojson
-description: Manipulate geojson data. Load and parse geojson from a string or a file.
+description: Utilities to work with geojson data. Parser with a reactive api, search and geofencing
 author: synw <ansterj@gmail.com>
 homepage: https://github.com/synw/geojson
 version: 0.5.0
