@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:geopoint/geopoint.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:meta/meta.dart';
 import 'package:pedantic/pedantic.dart';
@@ -94,7 +93,10 @@ class GeoJson {
 
   /// Parse the data from a file
   Future<void> parseFile(String path,
-      {String nameProperty, bool verbose = false, GeoJsonQuery query}) async {
+      {String nameProperty,
+      bool verbose = false,
+      GeoJsonQuery query,
+      bool disableStream = false}) async {
     final file = File(path);
     if (!file.existsSync()) {
       throw ("The file ${file.path} does not exist");
@@ -109,17 +111,28 @@ class GeoJson {
       print("Parsing file ${file.path}");
     }
     await _parse(data,
-        nameProperty: nameProperty, verbose: verbose, query: query);
+        nameProperty: nameProperty,
+        verbose: verbose,
+        query: query,
+        disableStream: disableStream);
   }
 
   /// Parse the data
   Future<void> parse(String data,
-      {String nameProperty, bool verbose = false}) async {
-    return await _parse(data, nameProperty: nameProperty, verbose: verbose);
+      {String nameProperty,
+      bool verbose = false,
+      bool disableStream = false}) async {
+    return await _parse(data,
+        nameProperty: nameProperty,
+        verbose: verbose,
+        disableStream: disableStream);
   }
 
   Future<void> _parse(String data,
-      {String nameProperty, bool verbose, GeoJsonQuery query}) async {
+      {String nameProperty,
+      bool verbose,
+      GeoJsonQuery query,
+      bool disableStream}) async {
     final finished = Completer<Null>();
     Iso iso;
     iso = Iso(_processFeatures, onDataOut: (dynamic data) {
@@ -128,41 +141,54 @@ class GeoJson {
           case GeoJsonFeatureType.point:
             final item = data.geometry as GeoJsonPoint;
             points.add(item);
-            _processedPointsController.sink.add(item);
+            if (!disableStream) {
+              _processedPointsController.sink.add(item);
+            }
             break;
           case GeoJsonFeatureType.multipoint:
             final item = data.geometry as GeoJsonMultiPoint;
             multipoints.add(item);
-            _processedMultipointsController.sink.add(item);
+            if (!disableStream) {
+              _processedMultipointsController.sink.add(item);
+            }
             break;
           case GeoJsonFeatureType.line:
             final item = data.geometry as GeoJsonLine;
             lines.add(item);
-            _processedLinesController.sink.add(item);
+            if (!disableStream) {
+              _processedLinesController.sink.add(item);
+            }
             break;
           case GeoJsonFeatureType.multiline:
             final item = data.geometry as GeoJsonMultiLine;
             multilines.add(item);
-            _processedMultilinesController.sink.add(item);
+            if (!disableStream) {
+              _processedMultilinesController.sink.add(item);
+            }
             break;
           case GeoJsonFeatureType.polygon:
             final item = data.geometry as GeoJsonPolygon;
             polygons.add(item);
-            _processedPolygonsController.sink.add(item);
+            if (!disableStream) {
+              _processedPolygonsController.sink.add(item);
+            }
             break;
           case GeoJsonFeatureType.multipolygon:
             final item = data.geometry as GeoJsonMultiPolygon;
             multipolygons.add(item);
-            _processedMultipolygonsController.sink.add(item);
+            if (!disableStream) {
+              _processedMultipolygonsController.sink.add(item);
+            }
         }
-        _processedFeaturesController.sink.add(data);
+        if (!disableStream) {
+          _processedFeaturesController.sink.add(data);
+        }
         features.add(data);
       } else {
         iso.dispose();
         finished.complete();
       }
     }, onError: (dynamic e) {
-      print("ERROR $e / ${e.runtimeType}");
       throw (e);
     });
     final dataToProcess = _DataToProcess(
@@ -185,25 +211,79 @@ class GeoJson {
   ///
   /// If the string data is not provided the existing features will be used
   /// to search
-  Future<void> search(
-      {String data,
-      @required GeoJsonQuery query,
+  Future<void> search(String data,
+      {@required GeoJsonQuery query,
       String nameProperty,
-      bool verbose = false}) async {
+      bool verbose = false,
+      bool disableStream = false}) async {
     if (data == null && features.isEmpty) {
       throw (ArgumentError("Provide data or parse some to run a search"));
     }
     if (data != null) {
       await _parse(data,
-          nameProperty: nameProperty, verbose: verbose, query: query);
+          nameProperty: nameProperty,
+          verbose: verbose,
+          query: query,
+          disableStream: disableStream);
     }
+  }
+
+  /// Find all the [GeoJsonPoint] within a certain distance
+  /// from a [GeoJsonPoint]
+  Future<List<GeoJsonPoint>> geofenceDistance(
+      {@required GeoJsonPoint point,
+      @required List<GeoJsonPoint> points,
+      @required num distance}) async {
+    final geoFencedPoints = <GeoJsonPoint>[];
+    final geodesy = Geodesy();
+    for (final p in points) {
+      final distanceFromCenter = geodesy.distanceBetweenTwoGeoPoints(
+          point.geoPoint.toLatLng(), p.geoPoint.toLatLng());
+      if (distanceFromCenter <= distance) {
+        geoFencedPoints.add(p);
+        _processedPointsController.add(p);
+      }
+    }
+    return geoFencedPoints;
   }
 
   /// Find all the [GeoJsonPoint] located in a [GeoJsonPolygon]
   /// from a list of points
-  Future<List<GeoJsonPoint>> geofence(
+  Future<List<GeoJsonPoint>> geofencePolygon(
       {@required GeoJsonPolygon polygon,
-      @required List<GeoJsonPoint> points}) async {
+      @required List<GeoJsonPoint> points,
+      bool disableStream = false,
+      bool verbose = false}) async {
+    final foundPoints = <GeoJsonPoint>[];
+    final finished = Completer<Null>();
+    Iso iso;
+    iso = Iso(_geofencePolygonRunner, onDataOut: (dynamic data) {
+      if (data is GeoJsonPoint) {
+        final point = data;
+        foundPoints.add(point);
+        if (!disableStream) {
+          _processedPointsController.sink.add(point);
+        }
+      } else {
+        iso.dispose();
+        finished.complete();
+      }
+    }, onError: (dynamic e) {
+      throw (e);
+    });
+    final dataToProcess =
+        _GeoFenceToProcess(points: points, polygon: polygon, verbose: verbose);
+    unawaited(iso.run(<dynamic>[dataToProcess]));
+    await finished.future;
+    return foundPoints;
+  }
+
+  static void _geofencePolygonRunner(IsoRunner iso) async {
+    final List<dynamic> args = iso.args;
+    final dataToProcess = args[0] as _GeoFenceToProcess;
+    final points = dataToProcess.points;
+    final polygon = dataToProcess.polygon;
+    final verbose = dataToProcess.verbose;
     final geodesy = Geodesy();
     final geoFencedPoints = <GeoJsonPoint>[];
     for (final point in points) {
@@ -211,11 +291,15 @@ class GeoJson {
         if (geodesy.isGeoPointInPolygon(
             point.geoPoint.toLatLng(ignoreErrors: true),
             geoSerie.toLatLng(ignoreErrors: true))) {
+          if (verbose) {
+            print("- ${point.name}");
+          }
           geoFencedPoints.add(point);
+          iso.send(point);
         }
       }
     }
-    return geoFencedPoints;
+    iso.send("end");
   }
 
   /// Dispose the class when finished using it
@@ -369,21 +453,25 @@ class GeoJson {
     bool isPropertyOk = true;
     if (query.property != null) {
       if (properties.containsKey(query.property)) {
+        String value = query.value.toString();
+        if (query.matchCase) {
+          value = query.value.toString().toLowerCase();
+        }
         switch (query.searchType) {
           case GeoSearchType.exact:
-            if (properties[query.property] != query.value) {
+            if (properties[query.property] != value) {
               isPropertyOk = false;
             }
             break;
           case GeoSearchType.startsWith:
             final prop = properties[query.property] as String;
-            if (!prop.startsWith(query.value as String)) {
+            if (!prop.startsWith(value)) {
               isPropertyOk = false;
             }
             break;
           case GeoSearchType.contains:
             final prop = properties[query.property] as String;
-            if (!prop.contains(query.value as String)) {
+            if (!prop.contains(value)) {
               isPropertyOk = false;
             }
             break;
@@ -405,4 +493,13 @@ class _DataToProcess {
   final String nameProperty;
   final bool verbose;
   final GeoJsonQuery query;
+}
+
+class _GeoFenceToProcess {
+  _GeoFenceToProcess(
+      {@required this.points, @required this.polygon, @required this.verbose});
+
+  final bool verbose;
+  final GeoJsonPolygon polygon;
+  final List<GeoJsonPoint> points;
 }
