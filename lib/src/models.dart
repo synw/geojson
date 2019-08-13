@@ -33,6 +33,17 @@ class GeoJsonFeatureCollection {
 
   /// The collection name
   String name;
+
+  /// Serialize to a geojson features collection
+  String serialize() {
+    var feats = '{"type": "FeatureCollection", "name": "$name"';
+    feats = feats + '"features": [';
+    for (final feat in collection) {
+      feats = feats + feat.serialize();
+    }
+    feats = feats + "]}";
+    return feats;
+  }
 }
 
 /// A geojson feature
@@ -46,8 +57,41 @@ class GeoJsonFeature<T> {
   /// The feature geo data
   T geometry;
 
-  /// The number of [GeoPoint] contained in the feature geometry
+  /// The number of [GeoPoint] contained in this feature geometry
   int get length => _length();
+
+  /// Serialize to a geojson feature
+  String serialize() {
+    assert(type != null, "The feature type can not be null for serialization");
+    String featStr;
+    switch (type) {
+      case GeoJsonFeatureType.point:
+        final geom = geometry as GeoJsonPoint;
+        featStr = geom.serializeFeature();
+        break;
+      case GeoJsonFeatureType.multipoint:
+        final geom = geometry as GeoJsonMultiPoint;
+        featStr = geom.serializeFeature();
+        break;
+      case GeoJsonFeatureType.line:
+        final geom = geometry as GeoJsonLine;
+        featStr = geom.serializeFeature();
+        break;
+      case GeoJsonFeatureType.multiline:
+        final geom = geometry as GeoJsonMultiLine;
+        featStr = geom.serializeFeature();
+        break;
+      case GeoJsonFeatureType.polygon:
+        final geom = geometry as GeoJsonPolygon;
+        featStr = geom.serializeFeature();
+        break;
+      case GeoJsonFeatureType.multipolygon:
+        final geom = geometry as GeoJsonMultiPolygon;
+        featStr = geom.serializeFeature();
+        break;
+    }
+    return featStr;
+  }
 
   int _length() {
     int total = 0;
@@ -98,6 +142,9 @@ class GeoJsonPoint {
 
   /// The name of the point
   String name;
+
+  /// Serialize to a geojson feature string
+  String serializeFeature() => geoPoint.toGeoJsonFeature();
 }
 
 /// Multiple points
@@ -110,6 +157,9 @@ class GeoJsonMultiPoint {
 
   /// The name of the point
   String name;
+
+  /// Serialize to a geojson feature string
+  String serializeFeature() => geoSerie.toGeoJsonFeature();
 }
 
 /// A line
@@ -122,6 +172,9 @@ class GeoJsonLine {
 
   /// The name of the line
   String name;
+
+  /// Serialize to a geojson feature string
+  String serializeFeature() => geoSerie.toGeoJsonFeature();
 }
 
 /// A multiline
@@ -136,6 +189,15 @@ class GeoJsonMultiLine {
 
   /// The name of the line
   String name;
+
+  /// Serialize to a geojson feature string
+  String serializeFeature() {
+    final geoSeries = <GeoSerie>[];
+    for (final line in lines) {
+      geoSeries.add(line.geoSerie);
+    }
+    return _buildGeoJsonFeature(geoSeries, "Line", name);
+  }
 }
 
 /// A polygon
@@ -150,6 +212,15 @@ class GeoJsonPolygon {
 
   /// The name of the polygon
   String name;
+
+  /// Serialize to a geojson feature string
+  String serializeFeature() {
+    final geoSeries = <GeoSerie>[];
+    for (final geoSerie in geoSeries) {
+      geoSeries.add(geoSerie);
+    }
+    return _buildGeoJsonFeature(geoSeries, "Polygon", name);
+  }
 }
 
 /// A multipolygon
@@ -164,6 +235,9 @@ class GeoJsonMultiPolygon {
 
   /// The name of the multipolygon
   String name;
+
+  /// Serialize to a geojson feature string
+  String serializeFeature() => _buildMultiGeoJsonFeature(polygons, name);
 }
 
 /// The type of search to process
@@ -185,6 +259,7 @@ class GeoJsonQuery {
       {this.property,
       this.value,
       this.geometryType,
+      this.matchCase = true,
       this.searchType = GeoSearchType.exact}) {
     if (geometryType == null) {
       if (property == null || value == null) {
@@ -206,4 +281,39 @@ class GeoJsonQuery {
 
   /// The type of search to process (for strings)
   final GeoSearchType searchType;
+
+  /// Match the case of string or not
+  final bool matchCase;
+}
+
+String _buildGeoJsonFeature(
+    List<GeoSerie> geoSeries, String type, String name) {
+  final coordsList = <String>[];
+  for (final geoSerie in geoSeries) {
+    coordsList.add(geoSerie.toGeoJsonCoordinates());
+  }
+  final coords = '[' + coordsList.join(",") + ']';
+  return '[{"type":"Feature","properties":{"name":"$name"}, ' +
+      '"geometry":{"type":"$type",' +
+      '"coordinates":' +
+      coords +
+      '}}]';
+}
+
+String _buildMultiGeoJsonFeature(List<GeoJsonPolygon> polygons, String name) {
+  final polyList = <String>[];
+  for (final polygon in polygons) {
+    final coordsList = <String>[];
+    for (final geoSerie in polygon.geoSeries) {
+      coordsList.add(geoSerie.toGeoJsonCoordinates());
+    }
+    final pcoords = '[' + coordsList.join(",") + ']';
+    polyList.add(pcoords);
+  }
+  final coords = polyList.join(",");
+  return '[{"type":"Feature","properties":{"name":"$name"}, ' +
+      '"geometry":{"type":"MultiPolygon",' +
+      '"coordinates":' +
+      coords +
+      '}}]';
 }
