@@ -32,6 +32,8 @@ final features = await featuresFromGeoJson(data);
 
 ## Reactive api
 
+### Parse and listen
+
 Typed streams are available to retrieve the features as soon as they are parsed. This is useful when the data is big.
 
 - `processedFeatures`: the parsed features: all the geometries
@@ -67,7 +69,25 @@ Example: add assets on a Flutter map:
   }
 ```
 
-Check the examples for more details
+### Data properties
+
+After the data is parsed the `GeoJson` instance has properties to access the data:
+
+```dart
+List<GeoJsonFeature> features;
+List<GeoJsonPoint> points;
+List<GeoJsonMultiPoint> multipoints;
+List<GeoJsonLine> lines;
+List<GeoJsonMultiLine> multilines;
+List<GeoJsonPolygon> polygons;
+List<GeoJsonMultiPolygon> multipolygons;
+```
+
+Example:
+
+```dart
+final List<GeoJsonLine> lines = geojson.lines;
+```
 
 ## Search
 
