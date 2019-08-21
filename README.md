@@ -32,7 +32,7 @@ final features = await featuresFromGeoJson(data);
 
 ## Reactive api
 
-Typed streams are available to retrieve the features as soon as they are parsed. 
+Typed streams are available to retrieve the features as soon as they are parsed. This is useful when the data is big.
 
 - `processedFeatures`: the parsed features: all the geometries
 - `processedPoints`: the parsed points
@@ -60,8 +60,7 @@ Example: add assets on a Flutter map:
         .loadString('assets/railroads_of_north_america.geojson');
     final geojson = GeoJson();
     geojson.processedLines.listen((GeoJsonLine line) {
-      final color = Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
-          .withOpacity(0.3);
+      final color = Colors.blue;
       setState(() => lines.add(Polyline(
           strokeWidth: 2.0, color: color, points: line.geoSerie.toLatLng())));
     });
