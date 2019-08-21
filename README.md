@@ -46,8 +46,6 @@ Typed streams are available to retrieve the features as soon as they are parsed.
 Example: add assets on a Flutter map:
 
 ```dart
-  import 'dart:math' as math;
-  import 'package:pedantic/pedantic.dart';
   import 'package:flutter/services.dart' show rootBundle;
   import 'package:geojson/geojson.dart';
   import 'package:flutter_map/flutter_map.dart';
