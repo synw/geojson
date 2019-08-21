@@ -24,9 +24,26 @@ Note: the data is parsed in an isolate to avoid slowing down the main thread
 - `nameProperty`: the property used for the geoserie name, automaticaly set if null
 - `verbose`: print the parsed data if true
 
+These functions are suitable for small data. Example:
+
+```dart
+final features = await featuresFromGeoJson(data);
+```
+
 ## Reactive api
 
-Typed streams are available to retrieve the features as soon as they are parsed. Example: add assets on a Flutter map:
+Typed streams are available to retrieve the features as soon as they are parsed. 
+
+- `processedFeatures`: the parsed features: all the geometries
+- `processedPoints`: the parsed points
+- `processedMultipoints`: the parsed multipoints
+- `processedLines`: the parsed lines
+- `processedMultilines`: the parsed multilines
+- `processedPolygons`: the parsed polygons
+- `processedMultipolygons`: the parsed multipolygons
+- `endSignal`: parsing is finished indicator
+
+Example: add assets on a Flutter map:
 
 ```dart
   import 'dart:math' as math;
@@ -54,17 +71,6 @@ Typed streams are available to retrieve the features as soon as they are parsed.
 ```
 
 Check the examples for more details
-
-### Available streams
-
-- `processedFeatures`: the parsed features: all the geometries
-- `processedPoints`: the parsed points
-- `processedMultipoints`: the parsed multipoints
-- `processedLines`: the parsed lines
-- `processedMultilines`: the parsed multilines
-- `processedPolygons`: the parsed polygons
-- `processedMultipolygons`: the parsed multipolygons
-- `endSignal`: parsing is finished indicator
 
 ## Search
 
