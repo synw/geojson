@@ -60,12 +60,11 @@ Example: add assets on a Flutter map:
         .loadString('assets/railroads_of_north_america.geojson');
     final geojson = GeoJson();
     geojson.processedLines.listen((GeoJsonLine line) {
-      final color = Colors.blue;
       setState(() => lines.add(Polyline(
-          strokeWidth: 2.0, color: color, points: line.geoSerie.toLatLng())));
+          strokeWidth: 2.0, color: Colors.blue, points: line.geoSerie.toLatLng())));
     });
     geojson.endSignal.listen((_) => geojson.dispose());
-    unawaited(geojson.parse(data, verbose: true));
+    await geojson.parse(data, verbose: true);
   }
 ```
 
