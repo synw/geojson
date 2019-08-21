@@ -56,14 +56,15 @@ Example: add assets on a Flutter map:
   final lines = <Polyline>[];
 
   Future<void> parseAndDrawAssetsOnMap() async {
-    final data = await rootBundle
-        .loadString('assets/railroads_of_north_america.geojson');
     final geojson = GeoJson();
     geojson.processedLines.listen((GeoJsonLine line) {
+      /// when a line is parsed add it to the map right away
       setState(() => lines.add(Polyline(
           strokeWidth: 2.0, color: Colors.blue, points: line.geoSerie.toLatLng())));
     });
     geojson.endSignal.listen((_) => geojson.dispose());
+    final data = await rootBundle
+        .loadString('assets/railroads_of_north_america.geojson');
     await geojson.parse(data, verbose: true);
   }
 ```
