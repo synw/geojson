@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   meta: ^1.1.6
-  geopoint: ^0.6.0
+  geopoint: ^0.6.1
   iso: ^0.2.3
   pedantic: ^1.6.0
   geodesy: ^0.3.1
