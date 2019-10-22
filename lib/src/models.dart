@@ -18,7 +18,10 @@ enum GeoJsonFeatureType {
   polygon,
 
   /// A multipolygon
-  multipolygon
+  multipolygon,
+
+  /// A geometry collection
+  //geometryCollection,
 }
 
 /// A list of features
@@ -144,7 +147,7 @@ class GeoJsonPoint {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() => geoPoint.toGeoJsonFeature();
+  String serializeFeature() => geoPoint.toGeoJsonFeatureString();
 }
 
 /// Multiple points
@@ -159,7 +162,7 @@ class GeoJsonMultiPoint {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() => geoSerie.toGeoJsonFeature();
+  String serializeFeature() => geoSerie.toGeoJsonFeatureString();
 }
 
 /// A line
@@ -174,7 +177,7 @@ class GeoJsonLine {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() => geoSerie.toGeoJsonFeature();
+  String serializeFeature() => geoSerie.toGeoJsonFeatureString();
 }
 
 /// A multiline
@@ -290,7 +293,7 @@ String _buildGeoJsonFeature(
     List<GeoSerie> geoSeries, String type, String name) {
   final coordsList = <String>[];
   for (final geoSerie in geoSeries) {
-    coordsList.add(geoSerie.toGeoJsonCoordinates());
+    coordsList.add(geoSerie.toGeoJsonCoordinatesString());
   }
   final coords = '[' + coordsList.join(",") + ']';
   return '[{"type":"Feature","properties":{"name":"$name"}, ' +
@@ -305,7 +308,7 @@ String _buildMultiGeoJsonFeature(List<GeoJsonPolygon> polygons, String name) {
   for (final polygon in polygons) {
     final coordsList = <String>[];
     for (final geoSerie in polygon.geoSeries) {
-      coordsList.add(geoSerie.toGeoJsonCoordinates());
+      coordsList.add(geoSerie.toGeoJsonCoordinatesString());
     }
     final pcoords = '[' + coordsList.join(",") + ']';
     polyList.add(pcoords);
