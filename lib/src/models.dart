@@ -218,10 +218,6 @@ class GeoJsonPolygon {
 
   /// Serialize to a geojson feature string
   String serializeFeature() {
-    final geoSeries = <GeoSerie>[];
-    for (final geoSerie in geoSeries) {
-      geoSeries.add(geoSerie);
-    }
     return _buildGeoJsonFeature(geoSeries, "Polygon", name);
   }
 }
