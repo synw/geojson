@@ -6,10 +6,10 @@ GeoJsonPoint getPoint(
     {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
   final point = GeoJsonPoint();
   final name = _getName(feature: feature, nameProperty: nameProperty);
-  final geoPoint = _getGeoPoints(<dynamic>[coordinates])[0];
-  geoPoint.name = name;
-  point.name = name;
-  point.geoPoint = geoPoint;
+  final geoPoint = _getGeoPoints(<dynamic>[coordinates])[0]..name = name;
+  point
+    ..name = name
+    ..geoPoint = geoPoint;
   return point;
 }
 
@@ -46,11 +46,10 @@ GeoJsonMultiLine getMultiLine(
     {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
   final name = _getName(feature: feature, nameProperty: nameProperty);
   final multiLine = GeoJsonMultiLine(name: name);
-  int i = 1;
+  var i = 1;
   for (final coords in coordinates) {
-    final line = GeoJsonLine();
-    line.name =
-        _getName(feature: feature, nameProperty: nameProperty, index: i);
+    final line = GeoJsonLine()
+      ..name = _getName(feature: feature, nameProperty: nameProperty, index: i);
     final geoSerie = GeoSerie(
         name: name,
         type: GeoSerieType.line,
@@ -71,8 +70,8 @@ GeoJsonPolygon getPolygon(
   for (final coords in coordinates) {
     final geoSerie = GeoSerie(
         name: _getName(feature: feature, nameProperty: nameProperty),
-        type: GeoSerieType.polygon);
-    geoSerie.geoPoints = _getGeoPoints(coords as List<dynamic>);
+        type: GeoSerieType.polygon)
+      ..geoPoints = _getGeoPoints(coords as List<dynamic>);
     polygon.geoSeries.add(geoSerie);
   }
   return polygon;
@@ -82,7 +81,7 @@ GeoJsonPolygon getPolygon(
 GeoJsonMultiPolygon getMultipolygon(
     {List<dynamic> coordinates, GeoJsonFeature feature, String nameProperty}) {
   final multiPolygon = GeoJsonMultiPolygon();
-  int i = 1;
+  var i = 1;
   multiPolygon.name = _getName(feature: feature, nameProperty: nameProperty);
   for (final coordsL2 in coordinates) {
     final polygon = GeoJsonPolygon();
@@ -92,8 +91,8 @@ GeoJsonMultiPolygon getMultipolygon(
     for (final coords in coordsL2) {
       final geoSerie = GeoSerie(
           name: _getName(feature: feature, nameProperty: nameProperty),
-          type: GeoSerieType.polygon);
-      geoSerie.geoPoints = _getGeoPoints(coords as List<dynamic>);
+          type: GeoSerieType.polygon)
+        ..geoPoints = _getGeoPoints(coords as List<dynamic>);
       polygon.geoSeries.add(geoSerie);
     }
     multiPolygon.polygons.add(polygon);

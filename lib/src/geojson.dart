@@ -1,13 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:geodesy/geodesy.dart';
+import 'package:iso/iso.dart';
 import 'package:meta/meta.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:iso/iso.dart';
-import 'models.dart';
+
 import 'deserializers.dart';
 import 'exceptions.dart';
+import 'models.dart';
 
 /// The main geojson class
 class GeoJson {
@@ -51,14 +53,14 @@ class GeoJson {
   /// All the multipolygons
   List<GeoJsonMultiPolygon> multipolygons;
 
-  StreamController<GeoJsonFeature> _processedFeaturesController;
-  StreamController<GeoJsonPoint> _processedPointsController;
-  StreamController<GeoJsonMultiPoint> _processedMultipointsController;
-  StreamController<GeoJsonLine> _processedLinesController;
-  StreamController<GeoJsonMultiLine> _processedMultilinesController;
-  StreamController<GeoJsonPolygon> _processedPolygonsController;
-  StreamController<GeoJsonMultiPolygon> _processedMultipolygonsController;
-  StreamController<bool> _endSignalController;
+  final StreamController<GeoJsonFeature> _processedFeaturesController;
+  final StreamController<GeoJsonPoint> _processedPointsController;
+  final StreamController<GeoJsonMultiPoint> _processedMultipointsController;
+  final StreamController<GeoJsonLine> _processedLinesController;
+  final StreamController<GeoJsonMultiLine> _processedMultilinesController;
+  final StreamController<GeoJsonPolygon> _processedPolygonsController;
+  final StreamController<GeoJsonMultiPolygon> _processedMultipolygonsController;
+  final StreamController<bool> _endSignalController;
 
   /// Stream of features that are coming in as they are parsed
   /// Useful for handing the featues faster if the file is big
@@ -99,13 +101,13 @@ class GeoJson {
       bool disableStream = false}) async {
     final file = File(path);
     if (!file.existsSync()) {
-      throw ("The file ${file.path} does not exist");
+      throw FileSystemException("The file ${file.path} does not exist");
     }
     String data;
     try {
       data = await file.readAsString();
     } catch (e) {
-      throw ("Can not read file $e");
+      throw FileSystemException("Can not read file $e");
     }
     if (verbose) {
       print("Parsing file ${file.path}");
@@ -122,7 +124,7 @@ class GeoJson {
       {String nameProperty,
       bool verbose = false,
       bool disableStream = false}) async {
-    return await _parse(data,
+    return _parse(data,
         nameProperty: nameProperty,
         verbose: verbose,
         disableStream: disableStream);
@@ -133,7 +135,7 @@ class GeoJson {
       bool verbose,
       GeoJsonQuery query,
       bool disableStream}) async {
-    final finished = Completer<Null>();
+    final finished = Completer<void>();
     Iso iso;
     iso = Iso(_processFeatures, onDataOut: (dynamic data) {
       if (data is GeoJsonFeature) {
@@ -189,7 +191,7 @@ class GeoJson {
         finished.complete();
       }
     }, onError: (dynamic e) {
-      throw (e);
+      throw ParseErrorException("Can not parse geojson $e");
     });
     final dataToProcess = _DataToProcess(
         data: data, nameProperty: nameProperty, verbose: verbose, query: query);
@@ -217,7 +219,7 @@ class GeoJson {
       bool verbose = false,
       bool disableStream = false}) async {
     if (data == null && features.isEmpty) {
-      throw (ArgumentError("Provide data or parse some to run a search"));
+      throw ArgumentError("Provide data or parse some to run a search");
     }
     if (data != null) {
       await _parse(data,
@@ -237,7 +239,7 @@ class GeoJson {
       bool disableStream = false,
       bool verbose = false}) async {
     final foundPoints = <GeoJsonPoint>[];
-    final finished = Completer<Null>();
+    final finished = Completer<void>();
     Iso iso;
     iso = Iso(_geoFenceDistanceRunner, onDataOut: (dynamic data) {
       if (data is GeoJsonPoint) {
@@ -251,7 +253,7 @@ class GeoJson {
         finished.complete();
       }
     }, onError: (dynamic e) {
-      throw (e);
+      throw GeofencingException("Can not geofence $e");
     });
     final dataToProcess = _GeoFenceDistanceToProcess(
         points: points, point: point, distance: distance, verbose: verbose);
@@ -261,7 +263,7 @@ class GeoJson {
   }
 
   static Future<void> _geoFenceDistanceRunner(IsoRunner iso) async {
-    final List<dynamic> args = iso.args;
+    final args = iso.args;
     final dataToProcess = args[0] as _GeoFenceDistanceToProcess;
     final points = dataToProcess.points;
     final distance = dataToProcess.distance;
@@ -289,7 +291,7 @@ class GeoJson {
       bool disableStream = false,
       bool verbose = false}) async {
     final foundPoints = <GeoJsonPoint>[];
-    final finished = Completer<Null>();
+    final finished = Completer<void>();
     Iso iso;
     iso = Iso(_geofencePolygonRunner, onDataOut: (dynamic data) {
       if (data is GeoJsonPoint) {
@@ -303,7 +305,7 @@ class GeoJson {
         finished.complete();
       }
     }, onError: (dynamic e) {
-      throw (e);
+      throw GeofencingException("Can not geofence polygon $e");
     });
     final dataToProcess =
         _GeoFenceToProcess(points: points, polygon: polygon, verbose: verbose);
@@ -312,8 +314,8 @@ class GeoJson {
     return foundPoints;
   }
 
-  static void _geofencePolygonRunner(IsoRunner iso) async {
-    final List<dynamic> args = iso.args;
+  static Future<void> _geofencePolygonRunner(IsoRunner iso) async {
+    final args = iso.args;
     final dataToProcess = args[0] as _GeoFenceToProcess;
     final points = dataToProcess.points;
     final polygon = dataToProcess.polygon;
@@ -349,14 +351,13 @@ class GeoJson {
   }
 
   static void _processFeatures(IsoRunner iso) {
-    final List<dynamic> args = iso.args;
+    final args = iso.args;
     final dataToProcess = args[0] as _DataToProcess;
-    final String data = dataToProcess.data;
-    final String nameProperty = dataToProcess.nameProperty;
-    final bool verbose = dataToProcess.verbose;
-    final GeoJsonQuery query = dataToProcess.query;
-    final Map<String, dynamic> decoded =
-        json.decode(data) as Map<String, dynamic>;
+    final data = dataToProcess.data;
+    final nameProperty = dataToProcess.nameProperty;
+    final verbose = dataToProcess.verbose;
+    final query = dataToProcess.query;
+    final decoded = json.decode(data) as Map<String, dynamic>;
     final feats = decoded["features"] as List<dynamic>;
     for (final dfeature in feats) {
       final feat = dfeature as Map<String, dynamic>;
@@ -466,7 +467,7 @@ class GeoJson {
           break;
         default:
           final e = FeatureNotSupported(geomType);
-          throw (e);
+          throw e;
       }
       if (query != null && properties != null) {
         if (!_checkProperty(properties, query)) {
@@ -475,7 +476,7 @@ class GeoJson {
       }
       iso.send(feature);
       if (verbose == true) {
-        print("${feature.type} ${feature.geometry.name} : " +
+        print("${feature.type} ${feature.geometry.name} : "
             "${feature.length} points");
       }
     }
@@ -484,10 +485,10 @@ class GeoJson {
 
   static bool _checkProperty(
       Map<String, dynamic> properties, GeoJsonQuery query) {
-    bool isPropertyOk = true;
+    var isPropertyOk = true;
     if (query.property != null) {
       if (properties.containsKey(query.property)) {
-        String value = query.value.toString();
+        var value = query.value.toString();
         if (query.matchCase) {
           value = query.value.toString().toLowerCase();
         }

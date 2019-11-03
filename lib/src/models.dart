@@ -39,13 +39,14 @@ class GeoJsonFeatureCollection {
 
   /// Serialize to a geojson features collection
   String serialize() {
-    var feats = '{"type": "FeatureCollection", "name": "$name"';
-    feats = feats + '"features": [';
+    final buffer = StringBuffer()
+      ..write('{"type": "FeatureCollection", "name": "$name"')
+      ..write('"features": [');
     for (final feat in collection) {
-      feats = feats + feat.serialize();
+      buffer.write(feat.serialize());
     }
-    feats = feats + "]}";
-    return feats;
+    buffer.write("]}");
+    return buffer.toString();
   }
 }
 
@@ -97,13 +98,13 @@ class GeoJsonFeature<T> {
   }
 
   int _length() {
-    int total = 0;
+    var total = 0;
     switch (type) {
       case GeoJsonFeatureType.point:
         total = 1;
         break;
       case GeoJsonFeatureType.multipoint:
-        GeoJsonMultiPoint g = geometry as GeoJsonMultiPoint;
+        final g = geometry as GeoJsonMultiPoint;
         total = g.geoSerie.geoPoints.length;
         break;
       case GeoJsonFeatureType.line:
@@ -262,9 +263,9 @@ class GeoJsonQuery {
       this.searchType = GeoSearchType.exact}) {
     if (geometryType == null) {
       if (property == null || value == null) {
-        throw (ArgumentError.notNull(
-            "Property and value must not be null if no geometry " +
-                "type is provided"));
+        throw ArgumentError.notNull(
+            "Property and value must not be null if no geometry "
+            "type is provided");
       }
     }
   }
@@ -292,9 +293,9 @@ String _buildGeoJsonFeature(
     coordsList.add(geoSerie.toGeoJsonCoordinatesString());
   }
   final coords = '[' + coordsList.join(",") + ']';
-  return '[{"type":"Feature","properties":{"name":"$name"}, ' +
-      '"geometry":{"type":"$type",' +
-      '"coordinates":' +
+  return '[{"type":"Feature","properties":{"name":"$name"}, '
+          '"geometry":{"type":"$type",'
+          '"coordinates":' +
       coords +
       '}}]';
 }
@@ -310,9 +311,9 @@ String _buildMultiGeoJsonFeature(List<GeoJsonPolygon> polygons, String name) {
     polyList.add(pcoords);
   }
   final coords = polyList.join(",");
-  return '[{"type":"Feature","properties":{"name":"$name"}, ' +
-      '"geometry":{"type":"MultiPolygon",' +
-      '"coordinates":' +
+  return '[{"type":"Feature","properties":{"name":"$name"}, '
+          '"geometry":{"type":"MultiPolygon",'
+          '"coordinates":' +
       coords +
       '}}]';
 }
