@@ -8,7 +8,11 @@ Future<GeoJsonFeatureCollection> featuresFromGeoJson(String data,
     {String nameProperty, bool verbose = false}) async {
   final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
-  await geojson.parse(data, nameProperty: nameProperty, verbose: verbose);
+  try {
+    await geojson.parse(data, nameProperty: nameProperty, verbose: verbose);
+  } catch (e) {
+    rethrow;
+  }
   geojson.features.forEach((f) => featureCollection.collection.add(f));
   geojson.dispose();
   return featureCollection;
@@ -19,8 +23,12 @@ Future<GeoJsonFeatureCollection> featuresFromGeoJsonFile(File file,
     {String nameProperty, bool verbose = false}) async {
   final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
-  await geojson.parseFile(file.path,
-      nameProperty: nameProperty, verbose: verbose);
+  try {
+    await geojson.parseFile(file.path,
+        nameProperty: nameProperty, verbose: verbose);
+  } catch (e) {
+    rethrow;
+  }
   geojson.features.forEach((f) => featureCollection.collection.add(f));
   geojson.dispose();
   return featureCollection;
