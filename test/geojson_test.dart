@@ -1,7 +1,8 @@
 import 'dart:io';
-import 'package:geojson/src/exceptions.dart';
-import "package:test/test.dart";
+
 import "package:geojson/geojson.dart";
+import "package:test/test.dart";
+
 import 'data.dart';
 
 void main() {
@@ -59,17 +60,22 @@ void main() {
   });
 
   test("wrongfile", () async {
-    expect(
-        () async => await featuresFromGeoJsonFile(File("test/wrong.geojson")),
-        throwsA("The file test/wrong.geojson does not exist"));
+    await featuresFromGeoJsonFile(File("test/wrong.geojson"))
+        .catchError((dynamic e) {
+      expect(e.runtimeType.toString() == "FileSystemException", true);
+      expect(e.message, "The file test/wrong.geojson does not exist");
+    });
   });
 
   test("unreadablefile", () async {
-    final msg = 'Can not read file FileSystemException: ' +
-        'Failed to decode data using encoding \'utf-8\', ' +
-        'path = \'test/data.bin\'';
-    expect(() async => await featuresFromGeoJsonFile(File("test/data.bin")),
-        throwsA(msg));
+    await featuresFromGeoJsonFile(File("test/data.bin"))
+        .catchError((dynamic e) {
+      expect(e.runtimeType.toString() == "FileSystemException", true);
+      expect(
+          e.message,
+          "Can not read file FileSystemException: "
+          "Failed to decode data using encoding 'utf-8', path = 'test/data.bin'");
+    });
   });
 
   test("file", () async {
