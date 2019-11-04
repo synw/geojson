@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0
+
+- Fix polygon serialization
+- Update dependencies
+- Improve the exceptions management
+- Improve the documentation
+- Use stronger analysis options
+
 ## 0.6.0
 
 - Add search methods
