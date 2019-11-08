@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+Fix `GeoJsonFeatureCollection` serializer
+
 ## 0.7.0
 
 - Fix polygon serialization
