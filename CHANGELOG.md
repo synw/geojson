@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2
+
+Fix in `GeoJsonQuery` serializer
+
 ## 0.7.1
 
 Fix `GeoJsonFeatureCollection` serializer
