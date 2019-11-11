@@ -293,11 +293,11 @@ String _buildGeoJsonFeature(
     coordsList.add(geoSerie.toGeoJsonCoordinatesString());
   }
   final coords = '[' + coordsList.join(",") + ']';
-  return '[{"type":"Feature","properties":{"name":"$name"}, '
+  return '{"type":"Feature","properties":{"name":"$name"}, '
           '"geometry":{"type":"$type",'
           '"coordinates":' +
       coords +
-      '}}]';
+      '}}';
 }
 
 String _buildMultiGeoJsonFeature(List<GeoJsonPolygon> polygons, String name) {
