@@ -1,4 +1,4 @@
-var geojsonPoint = """{
+String geojsonPoint = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -11,7 +11,7 @@ var geojsonPoint = """{
     }
   ]
 }""";
-var geojsonMultiPoint = """{
+String geojsonMultiPoint = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -23,7 +23,7 @@ var geojsonMultiPoint = """{
     }
   ]
 }""";
-var geojsonLine = """{
+String geojsonLine = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -39,7 +39,7 @@ var geojsonLine = """{
     }
   ]
 }""";
-var geojsonMultiLine = """{
+String geojsonMultiLine = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -68,7 +68,7 @@ var geojsonMultiLine = """{
     }
   ]
 }""";
-var geojsonPolygon = """{
+String geojsonPolygon = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -86,7 +86,7 @@ var geojsonPolygon = """{
     }
   ]
 }""";
-var geojsonMultiPolygon = """{
+String geojsonMultiPolygon = """{
   "type": "FeatureCollection",
   "features": [
     {
@@ -123,7 +123,7 @@ var geojsonMultiPolygon = """{
     }
   ]
 }""";
-var geojsonUnsupported = """{
+String geojsonUnsupported = """{
   "type": "FeatureCollection",
   "features": [
     {
