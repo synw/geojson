@@ -1,4 +1,5 @@
 import 'package:geopoint/geopoint.dart';
+import 'dart:convert';
 
 /// Geojson feature types
 enum GeoJsonFeatureType {
@@ -44,6 +45,8 @@ class GeoJsonFeatureCollection {
       ..write('"features": [');
     for (final feat in collection) {
       buffer.write(feat.serialize());
+      if (feat != collection.last)
+        buffer.write(',');
     }
     buffer.write("]}");
     return buffer.toString();
@@ -83,11 +86,11 @@ class GeoJsonFeature<T> {
         break;
       case GeoJsonFeatureType.multiline:
         final geom = geometry as GeoJsonMultiLine;
-        featStr = geom.serializeFeature();
+        featStr = geom.serializeFeature(properties);
         break;
       case GeoJsonFeatureType.polygon:
         final geom = geometry as GeoJsonPolygon;
-        featStr = geom.serializeFeature();
+        featStr = geom.serializeFeature(properties);
         break;
       case GeoJsonFeatureType.multipolygon:
         final geom = geometry as GeoJsonMultiPolygon;
@@ -195,12 +198,12 @@ class GeoJsonMultiLine {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() {
+  String serializeFeature(Map properties) {
     final geoSeries = <GeoSerie>[];
     for (final line in lines) {
       geoSeries.add(line.geoSerie);
     }
-    return _buildGeoJsonFeature(geoSeries, "Line", name);
+    return _buildGeoJsonFeature(geoSeries, "Line", properties?? {"name":name});
   }
 }
 
@@ -218,8 +221,8 @@ class GeoJsonPolygon {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() {
-    return _buildGeoJsonFeature(geoSeries, "Polygon", name);
+  String serializeFeature(Map properties) {
+    return _buildGeoJsonFeature(geoSeries, "Polygon", properties??{"name":name});
   }
 }
 
@@ -287,13 +290,13 @@ class GeoJsonQuery {
 }
 
 String _buildGeoJsonFeature(
-    List<GeoSerie> geoSeries, String type, String name) {
+    List<GeoSerie> geoSeries, String type, Map properties) {
   final coordsList = <String>[];
   for (final geoSerie in geoSeries) {
     coordsList.add(geoSerie.toGeoJsonCoordinatesString());
   }
   final coords = '[' + coordsList.join(",") + ']';
-  return '{"type":"Feature","properties":{"name":"$name"}, '
+  return '{"type":"Feature","properties":${jsonEncode(properties)},'
           '"geometry":{"type":"$type",'
           '"coordinates":' +
       coords +
