@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.3
+
+Include feature properties when serializing
+
 ## 0.7.2
 
 Fix in `GeoJsonQuery` serializer
