@@ -1,4 +1,5 @@
 import 'package:geopoint/geopoint.dart';
+import 'dart:convert';
 
 /// Geojson feature types
 enum GeoJsonFeatureType {
@@ -44,6 +45,8 @@ class GeoJsonFeatureCollection {
       ..write('"features": [');
     for (final feat in collection) {
       buffer.write(feat.serialize());
+      if (feat != collection.last)
+        buffer.write(',');
     }
     buffer.write("]}");
     return buffer.toString();
@@ -293,7 +296,7 @@ String _buildGeoJsonFeature(
     coordsList.add(geoSerie.toGeoJsonCoordinatesString());
   }
   final coords = '[' + coordsList.join(",") + ']';
-  return '{"type":"Feature","properties":${properties.toString()},'
+  return '{"type":"Feature","properties":${jsonEncode(properties)},'
           '"geometry":{"type":"$type",'
           '"coordinates":' +
       coords +
