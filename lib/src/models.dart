@@ -45,8 +45,9 @@ class GeoJsonFeatureCollection {
       ..write('"features": [');
     for (final feat in collection) {
       buffer.write(feat.serialize());
-      if (feat != collection.last)
+      if (feat != collection.last) {
         buffer.write(',');
+      }
     }
     buffer.write("]}");
     return buffer.toString();
@@ -203,7 +204,8 @@ class GeoJsonMultiLine {
     for (final line in lines) {
       geoSeries.add(line.geoSerie);
     }
-    return _buildGeoJsonFeature(geoSeries, "Line", properties?? {"name":name});
+    return _buildGeoJsonFeature(
+        geoSeries, "Line", properties ?? <String, dynamic>{"name": name});
   }
 }
 
@@ -222,7 +224,8 @@ class GeoJsonPolygon {
 
   /// Serialize to a geojson feature string
   String serializeFeature(Map properties) {
-    return _buildGeoJsonFeature(geoSeries, "Polygon", properties??{"name":name});
+    return _buildGeoJsonFeature(
+        geoSeries, "Polygon", properties ?? <String, dynamic>{"name": name});
   }
 }
 
