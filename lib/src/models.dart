@@ -23,7 +23,7 @@ enum GeoJsonFeatureType {
   multipolygon,
 
   /// A geometry collection
-  //geometryCollection,
+  geometryCollection,
 }
 
 /// A list of features
@@ -98,6 +98,8 @@ class GeoJsonFeature<T> {
         final geom = geometry as GeoJsonMultiPolygon;
         featStr = geom.serializeFeature();
         break;
+      case GeoJsonFeatureType.geometryCollection:
+        throw UnimplementedError("Geometry collection not implemented");
     }
     return featStr;
   }
@@ -136,9 +138,29 @@ class GeoJsonFeature<T> {
           }
         }
         break;
+      case GeoJsonFeatureType.geometryCollection:
+        final g = geometry as GeoJsonGeometryCollection;
+        total = g.geometries.length;
     }
     return total;
   }
+}
+
+/// A geometry collection
+class GeoJsonGeometryCollection {
+  /// Default constructor
+  GeoJsonGeometryCollection({this.geometries, this.name}) {
+    geometries ??= <GeoJsonFeature>[];
+  }
+
+  /// The geometries
+  List<GeoJsonFeature> geometries;
+
+  /// The name of the collection
+  String name;
+
+  /// Add a geometry to the collection
+  void add(GeoJsonFeature geom) => geometries.add(geom);
 }
 
 /// A point

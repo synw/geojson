@@ -181,6 +181,8 @@ class GeoJson {
             if (!disableStream) {
               _processedMultipolygonsController.sink.add(item);
             }
+            break;
+          case GeoJsonFeatureType.geometryCollection:
         }
         if (!disableStream) {
           _processedFeaturesController.sink.add(data);
@@ -191,7 +193,8 @@ class GeoJson {
         finished.complete();
       }
     }, onError: (dynamic e) {
-      throw ParseErrorException("Can not parse geojson $e");
+      print("Error: $e");
+      throw ParseErrorException("Can not parse geojson");
     });
     final dataToProcess = _DataToProcess(
         data: data, nameProperty: nameProperty, verbose: verbose, query: query);
@@ -350,6 +353,69 @@ class GeoJson {
     _endSignalController.close();
   }
 
+  static GeoJsonFeature _processGeometry(Map<String, dynamic> geometry,
+      Map<String, dynamic> properties, String nameProperty) {
+    final geomType = geometry["type"].toString();
+    GeoJsonFeature feature;
+    switch (geomType) {
+      case "MultiPolygon":
+        feature = GeoJsonFeature<GeoJsonMultiPolygon>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.multipolygon;
+        feature.geometry = getMultipolygon(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "Polygon":
+        feature = GeoJsonFeature<GeoJsonPolygon>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.polygon;
+        feature.geometry = getPolygon(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "MultiLineString":
+        feature = GeoJsonFeature<GeoJsonMultiLine>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.multiline;
+        feature.geometry = getMultiLine(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "LineString":
+        feature = GeoJsonFeature<GeoJsonLine>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.line;
+        feature.geometry = getLine(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "MultiPoint":
+        feature = GeoJsonFeature<GeoJsonMultiPoint>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.multipoint;
+        feature.geometry = getMultiPoint(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+      case "Point":
+        feature = GeoJsonFeature<GeoJsonPoint>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.point;
+        feature.geometry = getPoint(
+            feature: feature,
+            nameProperty: nameProperty,
+            coordinates: geometry["coordinates"] as List<dynamic>);
+        break;
+    }
+    return feature;
+  }
+
   static void _processFeatures(IsoRunner iso) {
     final args = iso.args;
     final dataToProcess = args[0] as _DataToProcess;
@@ -369,10 +435,20 @@ class GeoJson {
       final geomType = geometry["type"].toString();
       GeoJsonFeature feature;
       switch (geomType) {
+        case "GeometryCollection":
+          feature = GeoJsonFeature<GeoJsonGeometryCollection>()
+            ..properties = properties
+            ..type = GeoJsonFeatureType.geometryCollection
+            ..geometry = GeoJsonGeometryCollection();
+          if (nameProperty != null) {
+            feature.geometry.name = properties[nameProperty];
+          }
+          for (final geom in geometry["geometries"]) {
+            feature.geometry.add(_processGeometry(
+                geom as Map<String, dynamic>, properties, nameProperty));
+          }
+          break;
         case "MultiPolygon":
-          feature = GeoJsonFeature<GeoJsonMultiPolygon>();
-          feature.properties = properties;
-          feature.type = GeoJsonFeatureType.multipolygon;
           if (query != null) {
             if (query.geometryType != null) {
               if (query.geometryType != GeoJsonFeatureType.multipolygon) {
@@ -380,15 +456,9 @@ class GeoJson {
               }
             }
           }
-          feature.geometry = getMultipolygon(
-              feature: feature,
-              nameProperty: nameProperty,
-              coordinates: geometry["coordinates"] as List<dynamic>);
+          feature = _processGeometry(geometry, properties, nameProperty);
           break;
         case "Polygon":
-          feature = GeoJsonFeature<GeoJsonPolygon>();
-          feature.properties = properties;
-          feature.type = GeoJsonFeatureType.polygon;
           if (query != null) {
             if (query.geometryType != null) {
               if (query.geometryType != GeoJsonFeatureType.polygon) {
@@ -396,15 +466,9 @@ class GeoJson {
               }
             }
           }
-          feature.geometry = getPolygon(
-              feature: feature,
-              nameProperty: nameProperty,
-              coordinates: geometry["coordinates"] as List<dynamic>);
+          feature = _processGeometry(geometry, properties, nameProperty);
           break;
         case "MultiLineString":
-          feature = GeoJsonFeature<GeoJsonMultiLine>();
-          feature.properties = properties;
-          feature.type = GeoJsonFeatureType.multiline;
           if (query != null) {
             if (query.geometryType != null) {
               if (query.geometryType != GeoJsonFeatureType.multiline) {
@@ -412,15 +476,9 @@ class GeoJson {
               }
             }
           }
-          feature.geometry = getMultiLine(
-              feature: feature,
-              nameProperty: nameProperty,
-              coordinates: geometry["coordinates"] as List<dynamic>);
+          feature = _processGeometry(geometry, properties, nameProperty);
           break;
         case "LineString":
-          feature = GeoJsonFeature<GeoJsonLine>();
-          feature.properties = properties;
-          feature.type = GeoJsonFeatureType.line;
           if (query != null) {
             if (query.geometryType != null) {
               if (query.geometryType != GeoJsonFeatureType.line) {
@@ -428,15 +486,9 @@ class GeoJson {
               }
             }
           }
-          feature.geometry = getLine(
-              feature: feature,
-              nameProperty: nameProperty,
-              coordinates: geometry["coordinates"] as List<dynamic>);
+          feature = _processGeometry(geometry, properties, nameProperty);
           break;
         case "MultiPoint":
-          feature = GeoJsonFeature<GeoJsonMultiPoint>();
-          feature.properties = properties;
-          feature.type = GeoJsonFeatureType.multipoint;
           if (query != null) {
             if (query.geometryType != null) {
               if (query.geometryType != GeoJsonFeatureType.multipoint) {
@@ -444,15 +496,9 @@ class GeoJson {
               }
             }
           }
-          feature.geometry = getMultiPoint(
-              feature: feature,
-              nameProperty: nameProperty,
-              coordinates: geometry["coordinates"] as List<dynamic>);
+          feature = _processGeometry(geometry, properties, nameProperty);
           break;
         case "Point":
-          feature = GeoJsonFeature<GeoJsonPoint>();
-          feature.properties = properties;
-          feature.type = GeoJsonFeatureType.point;
           if (query != null) {
             if (query.geometryType != null) {
               if (query.geometryType != GeoJsonFeatureType.point) {
@@ -460,10 +506,7 @@ class GeoJson {
               }
             }
           }
-          feature.geometry = getPoint(
-              feature: feature,
-              nameProperty: nameProperty,
-              coordinates: geometry["coordinates"] as List<dynamic>);
+          feature = _processGeometry(geometry, properties, nameProperty);
           break;
         default:
           final e = FeatureNotSupported(geomType);
