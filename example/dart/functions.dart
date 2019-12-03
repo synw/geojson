@@ -4,16 +4,23 @@ import 'package:geojson/geojson.dart';
 // data is from http://www.naturalearthdata.com
 
 void main() async {
-  await smallData();
   await multipolygons();
   await lines();
+  await smallData();
 }
 
 Future<void> smallData() async {
   final file = File("../data/small_data.geojson");
   final features = await featuresFromGeoJsonFile(file);
   for (final feature in features.collection) {
-    print("Point: ${feature.geometry.geoPoint.name}");
+    if (feature.type == GeoJsonFeatureType.point) {
+      print("Point: ${feature.geometry.geoPoint.name}");
+    } else {
+      print("Feature: ${feature.type}: ${feature.geometry}");
+      for (final geom in feature.geometry.geometries) {
+        print("Geometry: $geom");
+      }
+    }
   }
   return;
 }
