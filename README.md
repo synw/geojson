@@ -133,6 +133,10 @@ Geofence points in a polygon:
 
 Note: the `processedPoints` stream is available to retrieve geofenced points as soon as they are found
 
+## Maps
+
+To draw geojson data on a map check the [Map controller](https://github.com/synw/map_controller#geojson-data) package
+
 ## Supported geojson features
 
 All the data structures use [GeoPoint](https://pub.dev/documentation/geopoint/latest/geopoint/GeoPoint-class.html) and [GeoSerie](https://pub.dev/documentation/geopoint/latest/geopoint/GeoSerie-class.html) from the [GeoPoint](https://github.com/synw/geopoint) package to store the geometry data. Data structures used:
