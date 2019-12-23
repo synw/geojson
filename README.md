@@ -183,4 +183,9 @@ All the data structures use [GeoPoint](https://pub.dev/documentation/geopoint/la
 - `String` **name**
 - `List<GeoJsonPolygon>` **polygons**
 
+**[GeoJsonGeometryCollection](https://pub.dev/documentation/geojson/latest/geojson/GeoJsonGeometryCollection-class.html)**:
+
+- `String` **name**
+- `List<GeoJsonFeature>` geometries
+
 Note: none of the parameters is final for all of these data structures
