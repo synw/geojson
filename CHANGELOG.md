@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+Add support for parsing `GeometryCollection` objects
+
 ## 0.7.3
 
 Include feature properties when serializing
