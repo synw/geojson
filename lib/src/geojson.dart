@@ -121,13 +121,85 @@ class GeoJson {
 
   /// Parse the data
   Future<void> parse(String data,
+          {String nameProperty,
+          bool verbose = false,
+          bool disableStream = false}) =>
+      _parse(data,
+          nameProperty: nameProperty,
+          verbose: verbose,
+          disableStream: disableStream);
+
+  void _pipeFeature(GeoJsonFeature data, {bool disableStream}) {
+    switch (data.type) {
+      case GeoJsonFeatureType.point:
+        final item = data.geometry as GeoJsonPoint;
+        points.add(item);
+        if (!disableStream) {
+          _processedPointsController.sink.add(item);
+        }
+        break;
+      case GeoJsonFeatureType.multipoint:
+        final item = data.geometry as GeoJsonMultiPoint;
+        multipoints.add(item);
+        if (!disableStream) {
+          _processedMultipointsController.sink.add(item);
+        }
+        break;
+      case GeoJsonFeatureType.line:
+        final item = data.geometry as GeoJsonLine;
+        lines.add(item);
+        if (!disableStream) {
+          _processedLinesController.sink.add(item);
+        }
+        break;
+      case GeoJsonFeatureType.multiline:
+        final item = data.geometry as GeoJsonMultiLine;
+        multilines.add(item);
+        if (!disableStream) {
+          _processedMultilinesController.sink.add(item);
+        }
+        break;
+      case GeoJsonFeatureType.polygon:
+        final item = data.geometry as GeoJsonPolygon;
+        polygons.add(item);
+        if (!disableStream) {
+          _processedPolygonsController.sink.add(item);
+        }
+        break;
+      case GeoJsonFeatureType.multipolygon:
+        final item = data.geometry as GeoJsonMultiPolygon;
+        multipolygons.add(item);
+        if (!disableStream) {
+          _processedMultipolygonsController.sink.add(item);
+        }
+        break;
+      case GeoJsonFeatureType.geometryCollection:
+    }
+    if (!disableStream) {
+      _processedFeaturesController.sink.add(data);
+    }
+    features.add(data);
+  }
+
+  /// Parse the geojson in the main thread not using any isolate:
+  /// necessary for the web
+  Future<void> parseInMainThread(String data,
       {String nameProperty,
+      GeoJsonQuery query,
       bool verbose = false,
       bool disableStream = false}) async {
-    return _parse(data,
-        nameProperty: nameProperty,
-        verbose: verbose,
-        disableStream: disableStream);
+    final dataToProcess = _DataToProcess(
+        data: data, nameProperty: nameProperty, verbose: verbose, query: query);
+    final _feats = StreamController<GeoJsonFeature>();
+    final _sub = _feats.stream.listen((f) {
+      print("FEAT SUB $f / ${f.type}");
+      _pipeFeature(f, disableStream: disableStream);
+    });
+    print("Processing");
+    _processFeatures(dataToProcess: dataToProcess, sink: _feats.sink);
+    print("Closing");
+    await _sub.cancel();
+    unawaited(_feats.close());
   }
 
   Future<void> _parse(String data,
@@ -137,57 +209,9 @@ class GeoJson {
       bool disableStream}) async {
     final finished = Completer<void>();
     Iso iso;
-    iso = Iso(_processFeatures, onDataOut: (dynamic data) {
+    iso = Iso(_processFeaturesIso, onDataOut: (dynamic data) {
       if (data is GeoJsonFeature) {
-        switch (data.type) {
-          case GeoJsonFeatureType.point:
-            final item = data.geometry as GeoJsonPoint;
-            points.add(item);
-            if (!disableStream) {
-              _processedPointsController.sink.add(item);
-            }
-            break;
-          case GeoJsonFeatureType.multipoint:
-            final item = data.geometry as GeoJsonMultiPoint;
-            multipoints.add(item);
-            if (!disableStream) {
-              _processedMultipointsController.sink.add(item);
-            }
-            break;
-          case GeoJsonFeatureType.line:
-            final item = data.geometry as GeoJsonLine;
-            lines.add(item);
-            if (!disableStream) {
-              _processedLinesController.sink.add(item);
-            }
-            break;
-          case GeoJsonFeatureType.multiline:
-            final item = data.geometry as GeoJsonMultiLine;
-            multilines.add(item);
-            if (!disableStream) {
-              _processedMultilinesController.sink.add(item);
-            }
-            break;
-          case GeoJsonFeatureType.polygon:
-            final item = data.geometry as GeoJsonPolygon;
-            polygons.add(item);
-            if (!disableStream) {
-              _processedPolygonsController.sink.add(item);
-            }
-            break;
-          case GeoJsonFeatureType.multipolygon:
-            final item = data.geometry as GeoJsonMultiPolygon;
-            multipolygons.add(item);
-            if (!disableStream) {
-              _processedMultipolygonsController.sink.add(item);
-            }
-            break;
-          case GeoJsonFeatureType.geometryCollection:
-        }
-        if (!disableStream) {
-          _processedFeaturesController.sink.add(data);
-        }
-        features.add(data);
+        _pipeFeature(data, disableStream: disableStream);
       } else {
         iso.dispose();
         finished.complete();
@@ -416,9 +440,21 @@ class GeoJson {
     return feature;
   }
 
-  static void _processFeatures(IsoRunner iso) {
+  static void _processFeaturesIso(IsoRunner iso) {
     final args = iso.args;
     final dataToProcess = args[0] as _DataToProcess;
+    _processFeatures(iso: iso, dataToProcess: dataToProcess);
+  }
+
+  static void _processFeatures(
+      {IsoRunner iso,
+      _DataToProcess dataToProcess,
+      StreamSink<GeoJsonFeature> sink}) {
+    if (iso == null) {
+      if (dataToProcess == null || sink == null) {
+        throw ArgumentError.notNull();
+      }
+    }
     final data = dataToProcess.data;
     final nameProperty = dataToProcess.nameProperty;
     final verbose = dataToProcess.verbose;
@@ -517,13 +553,20 @@ class GeoJson {
           continue;
         }
       }
-      iso.send(feature);
+      if (iso != null) {
+        iso.send(feature);
+      } else {
+        print("FEAT SINK $feature / ${feature.type}");
+        sink.add(feature);
+      }
       if (verbose == true) {
         print("${feature.type} ${feature.geometry.name} : "
             "${feature.length} points");
       }
     }
-    iso.send("end");
+    if (iso != null) {
+      iso.send("end");
+    }
   }
 
   static bool _checkProperty(

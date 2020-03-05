@@ -33,3 +33,25 @@ Future<GeoJsonFeatureCollection> featuresFromGeoJsonFile(File file,
   geojson.dispose();
   return featureCollection;
 }
+
+/// Get a feature collection from a geojson string using a parser
+/// in the main thread, without isolates: necessary for the web
+Future<GeoJsonFeatureCollection> featuresFromGeoJsonMainThread(String data,
+    {String nameProperty, bool verbose = false}) async {
+  final featureCollection = GeoJsonFeatureCollection();
+  final geojson = GeoJson();
+  try {
+    await geojson.parseInMainThread(data,
+        nameProperty: nameProperty, verbose: verbose);
+  } catch (e) {
+    rethrow;
+  }
+  geojson.features.forEach((f) {
+    if (verbose) {
+      print("Feature: ${f.type}");
+    }
+    featureCollection.collection.add(f);
+  });
+  geojson.dispose();
+  return featureCollection;
+}
