@@ -125,7 +125,9 @@ List<GeoPoint> _getGeoPoints(List<dynamic> coordsList) {
     final geoPoint = GeoPoint(
         latitude: double.parse(coord[1].toString()),
         longitude: double.parse(coord[0].toString()),
-        altitude: coord.length >= 3 ? double.parse(coord[2].toString()) : null);
+        altitude: (coord.length >= 3) == true
+            ? double.parse(coord[2].toString())
+            : null);
     geoPoints.add(geoPoint);
   }
   return geoPoints;
