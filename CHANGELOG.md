@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0
+
+- Add a parse in main thread method for web compatibility
+- Add altitude to GeoPoint if available
+- Update the flutter map example
+
 ## 0.8.0
 
 Add support for parsing `GeometryCollection` objects
