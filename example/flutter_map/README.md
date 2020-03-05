@@ -1,4 +1,4 @@
-# flutter_map
+# geojson_map
 
 A new Flutter project.
 
