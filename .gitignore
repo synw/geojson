@@ -30,7 +30,8 @@ docs/_build/
 .pub-cache/
 .pub/
 build/
-example/flutter_map/ios/Flutter/flutter_export_environment.sh
+**/flutter_export_environment.sh
+**/.flutter-plugins-dependencies
 
 # Android related
 **/android/**/gradle-wrapper.jar
