@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import "package:geojson/geojson.dart";
+import 'package:geopoint/geopoint.dart';
 import "package:test/test.dart";
 
 import 'data.dart';
@@ -96,4 +97,20 @@ void main() {
       expect(e.message, "The feature Unknown is not supported");
     }
   });*/
+
+  test("point properties", () async {
+    final gfc = GeoJsonFeatureCollection()..name="mapmatch";
+    final lprops = Map<String, dynamic>();
+    lprops["point_color"] = "#000";
+    lprops["point_size"] = "7";
+    final lp = GeoJsonFeature<GeoJsonPoint>()
+      ..type=GeoJsonFeatureType.point
+      ..properties=lprops
+      ..geometry=GeoJsonPoint(
+        geoPoint: GeoPoint(latitude: 37.111, longitude: 126.000), name: "a");
+    gfc.collection.add(lp);
+    final s = gfc.serialize();
+    expect(s.contains("\"point_size\":\"7\""), true);
+    expect(s.contains("\"point_color\":\"#000\""), true);
+  });
 }

@@ -76,7 +76,7 @@ class GeoJsonFeature<T> {
     switch (type) {
       case GeoJsonFeatureType.point:
         final geom = geometry as GeoJsonPoint;
-        featStr = geom.serializeFeature();
+        featStr = geom.serializeFeature(properties);
         break;
       case GeoJsonFeatureType.multipoint:
         final geom = geometry as GeoJsonMultiPoint;
@@ -175,7 +175,12 @@ class GeoJsonPoint {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() => geoPoint.toGeoJsonFeatureString();
+  String serializeFeature(Map properties)  {
+    final p = properties ?? <String, dynamic>{};
+    return '{"type":"Feature","properties":${jsonEncode(p)},'
+      '"geometry":{"type":"Point",'
+      '"coordinates":' + geoPoint.toGeoJsonCoordinatesString() + '}}';
+  }
 }
 
 /// Multiple points
