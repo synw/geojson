@@ -30,6 +30,14 @@ These functions are suitable for small data. Example:
 final features = await featuresFromGeoJson(data);
 ```
 
+## Web support
+
+**[featuresFromGeoJsonMainThread](https://pub.dev/documentation/geojson/latest/geojson/featuresFromGeoJsonMainThread.html)**: as the web do not support isolates use this function to parse in the main thread. Parameters:
+
+- `data`: a string with the geojson data, required
+- `nameProperty`: the property used for the geoserie name, automaticaly set if null
+- `verbose`: print the parsed data if true
+
 ## Reactive api
 
 ### Parse and listen
