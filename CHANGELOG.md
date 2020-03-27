@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1
+
+- Include point properties in serialization
+- Document the web support
+
 ## 0.9.0
 
 - Add a parse in main thread method for web compatibility
