@@ -42,7 +42,7 @@ class GeoJsonFeatureCollection {
   /// Serialize to a geojson features collection
   String serialize() {
     final buffer = StringBuffer()
-      ..write('{"type": "FeatureCollection", "name": "$name",')
+      ..write('{"type": "FeatureCollection", ' + (name == null ? '' : '"name": "$name", '))
       ..write('"features": [');
     for (final feat in collection) {
       buffer.write(feat.serialize());
