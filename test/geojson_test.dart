@@ -7,6 +7,29 @@ import "package:test/test.dart";
 import 'data.dart';
 
 void main() {
+  test("nested geometrycollection", () async {
+    final features = await featuresFromGeoJson(geojsonNestedGeometryCollection);
+    expect(features.collection.length, 1);
+    final feature = features.collection[0];
+    expect(feature.type, GeoJsonFeatureType.geometryCollection);
+    final collection = feature.geometry as GeoJsonGeometryCollection;
+    expect(collection.geometries.length, 2);
+    expect(
+        collection.geometries[0].type, GeoJsonFeatureType.geometryCollection);
+    final innerCollection =
+        collection.geometries[0].geometry as GeoJsonGeometryCollection;
+    expect(innerCollection.geometries.length, 2);
+    expect(
+        innerCollection.geometries
+            .every((element) => element.type == GeoJsonFeatureType.point),
+        true);
+
+    expect(collection.geometries[1].type, GeoJsonFeatureType.point);
+    final point = collection.geometries[1].geometry as GeoJsonPoint;
+    expect(point.geoPoint.latitude, 0);
+    expect(point.geoPoint.longitude, 0);
+  });
+
   test("point", () async {
     final features = await featuresFromGeoJson(geojsonPoint);
     expect(features.collection.length, 1);

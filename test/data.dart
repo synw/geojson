@@ -1,3 +1,34 @@
+String geojsonNestedGeometryCollection = """{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name": "collection"},
+      "geometry": {
+        "type": "GeometryCollection",
+        "geometries": [
+          {
+            "type": "GeometryCollection",
+            "geometries": [
+              {
+                "type": "Point",
+                "coordinates": [0, 0]
+              },
+              {
+                "type": "Point",
+                "coordinates": [1, 1]
+              }
+            ]
+          },
+          {
+            "type": "Point",
+            "coordinates": [0, 0]
+          }
+        ]
+      }
+    }
+  ]
+}""";
 String geojsonPoint = """{
   "type": "FeatureCollection",
   "features": [
