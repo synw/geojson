@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:geojson/geojson.dart';
 
 // data is from http://www.naturalearthdata.com
@@ -7,6 +8,7 @@ void main() async {
   await multipolygons();
   await lines();
   await smallData();
+  await nestedGeometryCollection();
 }
 
 Future<void> smallData() async {
@@ -45,5 +47,17 @@ Future<void> lines() async {
   for (final feature in features.collection) {
     print("${feature.geometry.geoSerie.name}: " +
         "${feature.geometry.geoSerie.geoPoints.length} geopoints");
+  }
+}
+
+Future<void> nestedGeometryCollection() async {
+  final file = File("../data/nested_geometry_collection.geojson");
+  final features = await featuresFromGeoJsonFile(file, nameProperty: "name");
+  for (final feature in features.collection) {
+    final dynamic geometry = feature.geometry;
+
+    if (geometry is GeoJsonGeometryCollection) {
+      print("${geometry.name}: " + "${geometry.geometries.length} collections");
+    }
   }
 }
