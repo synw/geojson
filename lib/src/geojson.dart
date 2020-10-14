@@ -382,6 +382,22 @@ class GeoJson {
     final geomType = geometry["type"].toString();
     GeoJsonFeature feature;
     switch (geomType) {
+      case "GeometryCollection":
+        feature = GeoJsonFeature<GeoJsonGeometryCollection>();
+        feature.properties = properties;
+        feature.type = GeoJsonFeatureType.geometryCollection;
+
+        final geometries = <GeoJsonFeature<dynamic>>[];
+        for (final geom in geometry["geometries"] as List<dynamic>) {
+          geometries.add(_processGeometry(
+              geom as Map<String, dynamic>, properties, nameProperty));
+        }
+
+        feature.geometry = getGeometryCollection(
+            feature: feature,
+            nameProperty: nameProperty,
+            geometries: geometries);
+        break;
       case "MultiPolygon":
         feature = GeoJsonFeature<GeoJsonMultiPolygon>();
         feature.properties = properties;
