@@ -1,5 +1,17 @@
 import 'package:geopoint/geopoint.dart';
+
 import 'models.dart';
+
+/// Get a collection inside another collection
+GeoJsonGeometryCollection getGeometryCollection(
+    {List<GeoJsonFeature> geometries,
+    GeoJsonFeature feature,
+    String nameProperty}) {
+  final name = _getName(feature: feature, nameProperty: nameProperty);
+  final collection =
+      GeoJsonGeometryCollection(geometries: geometries, name: name);
+  return collection;
+}
 
 /// Get a point from coordinates and feature
 GeoJsonPoint getPoint(
