@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.0
+
+- Update dependencies
+- Don't serialize null name to 'name: "null"'
+- Process nested geometry collections
+
 ## 0.9.1
 
 - Include point properties in serialization
