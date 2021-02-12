@@ -42,7 +42,7 @@ class GeoJsonFeatureCollection {
   /// Serialize to a geojson features collection
   String serialize() {
     final buffer = StringBuffer()
-      ..write('{"type": "FeatureCollection", "name": "$name",')
+      ..write('{"type": "FeatureCollection", ' + (name == null ? '' : '"name": "$name", '))
       ..write('"features": [');
     for (final feat in collection) {
       buffer.write(feat.serialize());
@@ -80,11 +80,11 @@ class GeoJsonFeature<T> {
         break;
       case GeoJsonFeatureType.multipoint:
         final geom = geometry as GeoJsonMultiPoint;
-        featStr = geom.serializeFeature();
+        featStr = geom.serializeFeature(properties);
         break;
       case GeoJsonFeatureType.line:
         final geom = geometry as GeoJsonLine;
-        featStr = geom.serializeFeature();
+        featStr = geom.serializeFeature(properties);
         break;
       case GeoJsonFeatureType.multiline:
         final geom = geometry as GeoJsonMultiLine;
@@ -195,7 +195,7 @@ class GeoJsonMultiPoint {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() => geoSerie.toGeoJsonFeatureString();
+  String serializeFeature(Map properties) => geoSerie.toGeoJsonFeatureString(properties);
 }
 
 /// A line
@@ -210,7 +210,7 @@ class GeoJsonLine {
   String name;
 
   /// Serialize to a geojson feature string
-  String serializeFeature() => geoSerie.toGeoJsonFeatureString();
+  String serializeFeature(Map properties) => geoSerie.toGeoJsonFeatureString(properties);
 }
 
 /// A multiline
