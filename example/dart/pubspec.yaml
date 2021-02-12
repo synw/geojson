@@ -1,8 +1,8 @@
 name: geojson_example
-description: Manipulate geojson data.
-author: synw <ansterj@gmail.com>
+description: Manipulate geojson data
 homepage: https://github.com/synw/geojson
 version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=2.0.0 <3.0.0'
