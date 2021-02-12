@@ -1,18 +1,19 @@
 name: geojson
-description: Utilities to work with geojson data. Parser with a reactive api, search and geofencing
+description: Utilities to work with geojson data. Parser with a reactive api,
+  search and geofencing
 homepage: https://github.com/synw/geojson
-version: 0.9.1
+version: 0.10.0
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
-  pedantic: ^1.8.0
-  extra_pedantic: ^1.1.1+3
-  meta: ^1.1.8
-  geopoint: ^0.7.1
-  iso: ^0.3.0
+  extra_pedantic: ^1.2.0
   geodesy: ^0.3.2
+  geopoint: ^0.8.0
+  iso: ^0.3.0
+  meta: ^1.1.8
+  pedantic: ^1.9.2
 
 dev_dependencies:
   test: ^1.6.5
