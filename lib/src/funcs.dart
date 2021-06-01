@@ -5,24 +5,25 @@ import 'models.dart';
 
 /// Get a feature collection from a geojson string
 Future<GeoJsonFeatureCollection> featuresFromGeoJson(String data,
-    {String nameProperty, bool verbose = false}) async {
+    {String? nameProperty, bool verbose = false}) async {
   final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
+  geojson.endSignal.listen((_) => geojson.dispose());
   try {
     await geojson.parse(data, nameProperty: nameProperty, verbose: verbose);
   } catch (e) {
     rethrow;
   }
   geojson.features.forEach((f) => featureCollection.collection.add(f));
-  geojson.dispose();
   return featureCollection;
 }
 
 /// Get a feature collection from a geojson file
 Future<GeoJsonFeatureCollection> featuresFromGeoJsonFile(File file,
-    {String nameProperty, bool verbose = false}) async {
+    {String? nameProperty, bool verbose = false}) async {
   final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
+  geojson.endSignal.listen((_) => geojson.dispose());
   try {
     await geojson.parseFile(file.path,
         nameProperty: nameProperty, verbose: verbose);
@@ -30,16 +31,16 @@ Future<GeoJsonFeatureCollection> featuresFromGeoJsonFile(File file,
     rethrow;
   }
   geojson.features.forEach((f) => featureCollection.collection.add(f));
-  geojson.dispose();
   return featureCollection;
 }
 
 /// Get a feature collection from a geojson string using a parser
 /// in the main thread, without isolates: necessary for the web
 Future<GeoJsonFeatureCollection> featuresFromGeoJsonMainThread(String data,
-    {String nameProperty, bool verbose = false}) async {
+    {String? nameProperty, bool verbose = false}) async {
   final featureCollection = GeoJsonFeatureCollection();
   final geojson = GeoJson();
+  geojson.endSignal.listen((_) => geojson.dispose());
   try {
     await geojson.parseInMainThread(data,
         nameProperty: nameProperty, verbose: verbose);
@@ -52,6 +53,5 @@ Future<GeoJsonFeatureCollection> featuresFromGeoJsonMainThread(String data,
     }
     featureCollection.collection.add(f);
   });
-  geojson.dispose();
   return featureCollection;
 }
