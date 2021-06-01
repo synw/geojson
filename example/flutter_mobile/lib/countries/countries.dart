@@ -5,7 +5,7 @@ import 'package:geojson/geojson.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class _CountriesPageState extends State<CountriesPage> {
   final polygons = <Polygon>[];
@@ -18,14 +18,16 @@ class _CountriesPageState extends State<CountriesPage> {
 
   Future<void> processData() async {
     final geojson = GeoJson();
-    geojson.processedMultipolygons.listen((GeoJsonMultiPolygon multiPolygon) {
+    geojson.processedMultiPolygons.listen((GeoJsonMultiPolygon multiPolygon) {
       for (final polygon in multiPolygon.polygons) {
         final geoSerie = GeoSerie(
             type: GeoSerieType.polygon,
             name: polygon.geoSeries[0].name,
             geoPoints: <GeoPoint>[]);
         for (final serie in polygon.geoSeries) {
-          geoSerie.geoPoints.addAll(serie.geoPoints);
+          if (serie.geoPoints != null) {
+            geoSerie.geoPoints?.addAll(serie.geoPoints!);
+          }
         }
         final color =
             Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)

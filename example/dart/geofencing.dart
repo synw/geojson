@@ -18,11 +18,11 @@ Future<void> main(List<String> args) async {
           value: countryName),
       nameProperty: "ADMIN",
       verbose: true);
-  if (geo.multipolygons.isEmpty) {
+  if (geo.multiPolygons.isEmpty) {
     print("Country $countryName not found");
     return;
   }
-  final country = geo.multipolygons;
+  final country = geo.multiPolygons;
   print("Loading airports");
   await geo.parseFile("../flutter_map/assets/airports.geojson",
       disableStream: true);
