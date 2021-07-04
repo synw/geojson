@@ -9,14 +9,8 @@ environment:
 
 dependencies:
   geodesy: ^0.4.0-nullsafety.0
-  geopoint: ^0.9.0
+  geopoint: ^1.0.0
   iso: ^1.0.0
-
-dependency_overrides:
-  geopoint:
-    git:
-      url: https://github.com/it-sam/geopoint.git
-      commit: 7a28e2
 
 dev_dependencies:
   extra_pedantic: ^1.4.0
