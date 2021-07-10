@@ -35,7 +35,8 @@ class IndexPage extends StatelessWidget {
 }
 
 class MainButton extends StatelessWidget {
-  const MainButton({Key key, this.text, this.icon, this.link})
+  const MainButton(
+      {Key? key, required this.text, required this.icon, required this.link})
       : super(key: key);
 
   final String text;

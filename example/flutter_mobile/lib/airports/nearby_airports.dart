@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:geojson/geojson.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:flutter_map/flutter_map.dart';
 
@@ -11,7 +11,7 @@ class _NearbyAirportsPageState extends State<NearbyAirportsPage> {
   final markers = <Marker>[];
   var airportsData = <GeoJsonPoint>[];
   final geo = GeoJson();
-  StreamSubscription<GeoJsonPoint> sub;
+  late StreamSubscription<GeoJsonPoint> sub;
   final dataIsLoaded = Completer<Null>();
   String status = "Loading data ...";
 
@@ -25,7 +25,7 @@ class _NearbyAirportsPageState extends State<NearbyAirportsPage> {
     sub = geo.processedPoints.listen((point) {
       // listen for the geofenced airports
       setState(() => markers.add(Marker(
-          point: point.geoPoint.toLatLng(),
+          point: point.geoPoint.toLatLng()!,
           builder: (BuildContext context) => Icon(Icons.local_airport))));
     });
   }

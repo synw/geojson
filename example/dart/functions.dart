@@ -5,7 +5,7 @@ import 'package:geojson/geojson.dart';
 // data is from http://www.naturalearthdata.com
 
 void main() async {
-  await multipolygons();
+  await multiPolygons();
   await lines();
   await smallData();
   await nestedGeometryCollection();
@@ -27,7 +27,7 @@ Future<void> smallData() async {
   return;
 }
 
-Future<void> multipolygons() async {
+Future<void> multiPolygons() async {
   final file = File("../data/lakes_of_europe.geojson");
   final features = await featuresFromGeoJsonFile(file, nameProperty: "label");
   for (final feature in features.collection) {

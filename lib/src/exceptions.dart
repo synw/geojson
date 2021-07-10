@@ -9,7 +9,7 @@ class FeatureNotSupported implements Exception {
   final String feature;
 
   /// The exception message
-  String message;
+  String? message;
 }
 
 /// An exception for file manipulation

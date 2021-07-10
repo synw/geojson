@@ -4,7 +4,7 @@ import 'package:pedantic/pedantic.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson/geojson.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class _RailroadsPageState extends State<RailroadsPage> {
   final lines = <Polyline>[];
@@ -24,7 +24,7 @@ class _RailroadsPageState extends State<RailroadsPage> {
       final color = Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
           .withOpacity(0.3);
       setState(() => lines.add(Polyline(
-          strokeWidth: 2.0, color: color, points: line.geoSerie.toLatLng())));
+          strokeWidth: 2.0, color: color, points: line.geoSerie!.toLatLng())));
     });
     geojson.endSignal.listen((_) => geojson.dispose());
     unawaited(geojson.parse(data, verbose: true));

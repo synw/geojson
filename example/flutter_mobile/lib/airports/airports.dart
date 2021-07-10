@@ -4,7 +4,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geojson/geojson.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class _AirportsPageState extends State<AirportsPage> {
   final polygons = <Polygon>[];
@@ -16,7 +16,7 @@ class _AirportsPageState extends State<AirportsPage> {
   var countriesData = <GeoJsonMultiPolygon>[];
   var airportsData = <GeoJsonPoint>[];
   final mapController = MapController();
-  StreamSubscription<GeoJsonPoint> sub;
+  late StreamSubscription<GeoJsonPoint> sub;
   bool isSearching = false;
   bool dataIsLoaded = false;
   bool showSearchResults = false;
@@ -37,10 +37,11 @@ class _AirportsPageState extends State<AirportsPage> {
         isSearching = false;
       }
     });
-    sub = geo.processedPoints.listen((point) {
+    sub = geo.processedPoints.listen((geojsonPoint) {
       // listen for the geofenced airports
+      final point = geojsonPoint.geoPoint.toLatLng()!;
       setState(() => markers.add(Marker(
-          point: point.geoPoint.toLatLng(),
+          point: point,
           builder: (BuildContext context) => Icon(Icons.local_airport))));
     });
   }
@@ -49,7 +50,7 @@ class _AirportsPageState extends State<AirportsPage> {
     final data = await rootBundle.loadString('assets/countries.geojson');
     await geo.parse(data,
         nameProperty: "ADMIN", disableStream: true, verbose: true);
-    countriesData = geo.multipolygons;
+    countriesData = geo.multiPolygons;
   }
 
   Future<void> loadAirports() async {
@@ -62,7 +63,8 @@ class _AirportsPageState extends State<AirportsPage> {
     print('Searching for countries: $name');
     final foundCountries = <GeoJsonMultiPolygon>[];
     for (final c in countriesData) {
-      if (c.name.toLowerCase().startsWith(name.toLowerCase())) {
+      if (c.name == null) return foundCountries;
+      if (c.name!.toLowerCase().startsWith(name.toLowerCase())) {
         foundCountries.add(c);
       }
     }
@@ -131,7 +133,7 @@ class _AirportsPageState extends State<AirportsPage> {
                     itemBuilder: (BuildContext context, int i) {
                       return ListTile(
                           title: GestureDetector(
-                              child: Text(countriesToSelect[i].name),
+                              child: Text(countriesToSelect[i].name ?? ""),
                               onTap: () {
                                 final country = countriesToSelect[i];
                                 setState(() {
