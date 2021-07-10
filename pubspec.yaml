@@ -2,7 +2,7 @@ name: geojson
 description: Utilities to work with geojson data. Parser with a reactive api,
   search and geofencing
 homepage: https://github.com/synw/geojson
-version: 0.10.0
+version: 1.0.0
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
