@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+Migration to null safety
+
 ## 0.10.0
 
 - Update dependencies
