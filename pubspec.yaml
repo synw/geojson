@@ -11,6 +11,7 @@ dependencies:
   geodesy: ^0.4.0-nullsafety.0
   geopoint: ^1.0.0
   iso: ^1.0.0
+  pedantic: ^1.11.1
 
 dev_dependencies:
   extra_pedantic: ^1.4.0
