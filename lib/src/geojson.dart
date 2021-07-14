@@ -169,14 +169,22 @@ class GeoJson {
         data: data, nameProperty: nameProperty, verbose: verbose, query: query);
     final _feats = StreamController<GeoJsonFeature<dynamic>?>();
     final _sub = _feats.stream.listen((f) {
-      print("FEAT SUB $f / ${f!.type}");
-      _pipeFeature(f, disableStream: disableStream);
+      if (verbose) {
+        print("FEAT SUB $f / ${f!.type}");
+      }
+
+      _pipeFeature(f!, disableStream: disableStream);
     });
-    print("Processing");
+    if (verbose) {
+      print("Processing");
+    }
     _processFeatures(dataToProcess: dataToProcess, sink: _feats.sink);
-    print("Closing");
+    if (verbose) {
+      print("Closing");
+    }
+
+    await _feats.close();
     await _sub.cancel();
-    unawaited(_feats.close());
   }
 
   Future<void> _parse(
@@ -547,7 +555,9 @@ class GeoJson {
       if (iso != null) {
         iso.send(feature);
       } else {
-        print("FEAT SINK $feature / ${feature?.type}");
+        if (verbose) {
+          print("FEAT SINK $feature / ${feature?.type}");
+        }
         sink?.add(feature);
       }
       if (verbose == true) {
