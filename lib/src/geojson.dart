@@ -358,9 +358,10 @@ class GeoJson {
       return false;
     }
 
+    final dynamic geometry = feature.geometry;
     switch (feature.type) {
       case GeoJsonFeatureType.geometryCollection:
-        final collection = feature as GeoJsonGeometryCollection;
+        final collection = geometry as GeoJsonGeometryCollection;
         for (final geometry in collection.geometries??<GeoJsonFeature<dynamic>?>[]) {
           if(_isOverlapping(boundingBox, geometry)) {
             return true;
@@ -368,7 +369,7 @@ class GeoJson {
         }
        return false;
       case GeoJsonFeatureType.multipolygon:
-        final multiPolygon = feature as GeoJsonMultiPolygon;
+        final multiPolygon = geometry as GeoJsonMultiPolygon;
         for (final polygon in multiPolygon.polygons) {
           if(boundingBox.containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
             return true;
@@ -376,31 +377,31 @@ class GeoJson {
         }
         return false;
       case GeoJsonFeatureType.polygon:
-        final polygon = feature as GeoJsonPolygon;
+        final polygon = geometry as GeoJsonPolygon;
         if(boundingBox.containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.multiline:
-        final multiLine = feature as GeoJsonMultiLine;
+        final multiLine = geometry as GeoJsonMultiLine;
         if(boundingBox.containsAny(multiLine.lines.expand((e) => e.geoSerie?.geoPoints??[]))) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.line:
-        final line = feature as GeoJsonLine;
+        final line = geometry as GeoJsonLine;
         if(boundingBox.containsAny(line.geoSerie?.geoPoints??[])) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.multipoint:
-        final multiPoint = feature as GeoJsonMultiPoint;
+        final multiPoint = geometry as GeoJsonMultiPoint;
         if(boundingBox.containsAny(multiPoint.geoSerie?.geoPoints??[])) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.point:
-        final point = feature as GeoJsonPoint;
+        final point = geometry as GeoJsonPoint;
         if(boundingBox.containsAny([point.geoPoint])) {
           return true;
         }
