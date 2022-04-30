@@ -79,6 +79,7 @@ class GeoJson {
   /// The stream indicating that the parsing is finished
   /// Use it to dispose the class if not needed anymore after parsing
   Stream<bool> get endSignal => _endSignalController.stream;
+
   // internal method
   Stream<T> _getGeoStream<T>() => _processedFeaturesController.stream
       .asBroadcastStream()
@@ -91,20 +92,8 @@ class GeoJson {
       bool verbose = false,
       GeoJsonQuery? query,
       bool disableStream = false}) async {
-    final file = File(path);
-    if (!file.existsSync()) {
-      throw FileSystemException("The file ${file.path} does not exist");
-    }
-    String data;
-    try {
-      data = await file.readAsString();
-    } catch (e) {
-      throw FileSystemException("Can not read file $e");
-    }
-    if (verbose) {
-      print("Parsing file ${file.path}");
-    }
-    await _parse(data,
+    await _parse(
+        fileName: path,
         nameProperty: nameProperty,
         verbose: verbose,
         query: query,
@@ -116,7 +105,8 @@ class GeoJson {
           {String? nameProperty,
           bool verbose = false,
           bool disableStream = false}) =>
-      _parse(data,
+      _parse(
+          data: data,
           nameProperty: nameProperty,
           verbose: verbose,
           disableStream: disableStream);
@@ -179,8 +169,9 @@ class GeoJson {
     unawaited(_feats.close());
   }
 
-  Future<void> _parse(
-    String data, {
+  Future<void> _parse({
+    String? data,
+    String? fileName,
     required bool disableStream,
     required bool verbose,
     String? nameProperty,
@@ -200,7 +191,11 @@ class GeoJson {
       throw ParseErrorException("Can not parse geojson");
     });
     final dataToProcess = _DataToProcess(
-        data: data, nameProperty: nameProperty, verbose: verbose, query: query);
+        data: data,
+        fileName: fileName,
+        nameProperty: nameProperty,
+        verbose: verbose,
+        query: query);
     unawaited(iso.run(<dynamic>[dataToProcess]));
     await finished.future;
     _endSignalController.sink.add(true);
@@ -228,7 +223,8 @@ class GeoJson {
       throw ArgumentError("Provide data or parse some to run a search");
     }
     if (data != null) {
-      await _parse(data,
+      await _parse(
+          data: data,
           nameProperty: nameProperty,
           verbose: verbose,
           query: query,
@@ -351,10 +347,8 @@ class GeoJson {
   }
 
   static bool _isOverlapping(
-      GeoBoundingBox boundingBox,
-     GeoJsonFeature<dynamic>? feature) {
-
-    if(feature == null) {
+      GeoBoundingBox boundingBox, GeoJsonFeature<dynamic>? feature) {
+    if (feature == null) {
       return false;
     }
 
@@ -362,47 +356,51 @@ class GeoJson {
     switch (feature.type) {
       case GeoJsonFeatureType.geometryCollection:
         final collection = geometry as GeoJsonGeometryCollection;
-        for (final geometry in collection.geometries??<GeoJsonFeature<dynamic>?>[]) {
-          if(_isOverlapping(boundingBox, geometry)) {
+        for (final geometry
+            in collection.geometries ?? <GeoJsonFeature<dynamic>?>[]) {
+          if (_isOverlapping(boundingBox, geometry)) {
             return true;
           }
         }
-       return false;
+        return false;
       case GeoJsonFeatureType.multipolygon:
         final multiPolygon = geometry as GeoJsonMultiPolygon;
         for (final polygon in multiPolygon.polygons) {
-          if(boundingBox.containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
+          if (boundingBox
+              .containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
             return true;
           }
         }
         return false;
       case GeoJsonFeatureType.polygon:
         final polygon = geometry as GeoJsonPolygon;
-        if(boundingBox.containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
+        if (boundingBox
+            .containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.multiline:
         final multiLine = geometry as GeoJsonMultiLine;
-        if(boundingBox.containsAny(multiLine.lines.expand((e) => e.geoSerie?.geoPoints??[]))) {
+        if (boundingBox.containsAny(
+            multiLine.lines.expand((e) => e.geoSerie?.geoPoints ?? []))) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.line:
         final line = geometry as GeoJsonLine;
-        if(boundingBox.containsAny(line.geoSerie?.geoPoints??[])) {
+        if (boundingBox.containsAny(line.geoSerie?.geoPoints ?? [])) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.multipoint:
         final multiPoint = geometry as GeoJsonMultiPoint;
-        if(boundingBox.containsAny(multiPoint.geoSerie?.geoPoints??[])) {
+        if (boundingBox.containsAny(multiPoint.geoSerie?.geoPoints ?? [])) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.point:
         final point = geometry as GeoJsonPoint;
-        if(boundingBox.containsAny([point.geoPoint])) {
+        if (boundingBox.containsAny([point.geoPoint])) {
           return true;
         }
         return false;
@@ -506,10 +504,26 @@ class GeoJson {
         throw ArgumentError.notNull();
       }
     }
-    final data = dataToProcess.data;
+
     final nameProperty = dataToProcess.nameProperty;
     final verbose = dataToProcess.verbose;
     final query = dataToProcess.query;
+
+    var data = dataToProcess.data;
+    if (data == null) {
+      final file = File(dataToProcess.fileName!);
+      if (!file.existsSync()) {
+        throw FileSystemException("The file ${file.path} does not exist");
+      }
+      try {
+        data = file.readAsStringSync();
+      } catch (e) {
+        throw FileSystemException("Can not read file $e");
+      }
+      if (verbose) {
+        print("Parsing file ${file.path}");
+      }
+    }
     final decoded = json.decode(data) as Map<String, dynamic>;
     final feats = decoded["features"] as List<dynamic>;
     for (final dFeature in feats) {
@@ -604,8 +618,8 @@ class GeoJson {
           continue;
         }
       }
-      if(query?.boundingBox != null) {
-        if(!_isOverlapping(query!.boundingBox!, feature)) {
+      if (query?.boundingBox != null) {
+        if (!_isOverlapping(query!.boundingBox!, feature)) {
           if (verbose == true) {
             print("Skipping out of bounds feature $feature / ${feature?.type}");
           }
@@ -666,12 +680,18 @@ class GeoJson {
 
 class _DataToProcess {
   _DataToProcess(
-      {required this.data,
+      {this.data,
+      this.fileName,
       required this.nameProperty,
       required this.verbose,
-      required this.query});
+      required this.query}) {
+    if (this.data == null && this.fileName == null) {
+      throw ArgumentError.notNull("Either data or filename should be provided");
+    }
+  }
 
-  final String data;
+  final String? fileName;
+  final String? data;
   final String? nameProperty;
   final bool verbose;
   final GeoJsonQuery? query;
