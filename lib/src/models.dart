@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:geodesy/geodesy.dart';
 import 'package:geopoint/geopoint.dart';
 
 /// Geojson feature types
@@ -303,7 +304,8 @@ class GeoJsonQuery {
       this.value,
       this.geometryType,
       this.matchCase = true,
-      this.searchType = GeoSearchType.exact}) {
+      this.searchType = GeoSearchType.exact,
+      this.boundingBox,}) {
     if (geometryType == null) {
       if (property == null || value == null) {
         throw ArgumentError.notNull(
@@ -327,6 +329,39 @@ class GeoJsonQuery {
 
   /// Match the case of string or not
   final bool matchCase;
+
+  /// Bounding box to search for features that overlap
+  final GeoBoundingBox? boundingBox;
+}
+
+/// A Geo Bounding Box used for search
+class GeoBoundingBox {
+
+  /// Creates a new GeoBoundingBox instance with the supplied min/max coordinates
+  GeoBoundingBox({required this.coords});
+
+  /// Coordinates of the bounding box
+  /// [min longitude, min latitude, max longitude, max latitude]
+  final List<double> coords;
+
+  /// Checks if any of the points are withing the bounds defined by the bounding box
+  bool containsAny(Iterable<GeoPoint> points) {
+
+    // check if bounding box rectangle contains any of the provided points
+
+    final minLon = coords[0];
+    final minLat = coords[1];
+    final maxLon = coords[2];
+    final maxLat = coords[3];
+
+    for (var p in points) {
+      if (p.latitude >= minLat && p.latitude <= maxLat && p.longitude >= minLon && p.longitude <= maxLon) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }
 
 String _buildGeoJsonFeature(

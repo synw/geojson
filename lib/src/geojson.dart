@@ -350,6 +350,65 @@ class GeoJson {
     _endSignalController.close();
   }
 
+  static bool _isOverlapping(
+      GeoBoundingBox boundingBox,
+     GeoJsonFeature<dynamic>? feature) {
+
+    if(feature == null) {
+      return false;
+    }
+
+    switch (feature.type) {
+      case GeoJsonFeatureType.geometryCollection:
+        final collection = feature as GeoJsonGeometryCollection;
+        for (final geometry in collection.geometries??<GeoJsonFeature<dynamic>?>[]) {
+          if(_isOverlapping(boundingBox, geometry)) {
+            return true;
+          }
+        }
+       return false;
+      case GeoJsonFeatureType.multipolygon:
+        final multiPolygon = feature as GeoJsonMultiPolygon;
+        for (final polygon in multiPolygon.polygons) {
+          if(boundingBox.containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
+            return true;
+          }
+        }
+        return false;
+      case GeoJsonFeatureType.polygon:
+        final polygon = feature as GeoJsonPolygon;
+        if(boundingBox.containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
+          return true;
+        }
+        return false;
+      case GeoJsonFeatureType.multiline:
+        final multiLine = feature as GeoJsonMultiLine;
+        if(boundingBox.containsAny(multiLine.lines.expand((e) => e.geoSerie?.geoPoints??[]))) {
+          return true;
+        }
+        return false;
+      case GeoJsonFeatureType.line:
+        final line = feature as GeoJsonLine;
+        if(boundingBox.containsAny(line.geoSerie?.geoPoints??[])) {
+          return true;
+        }
+        return false;
+      case GeoJsonFeatureType.multipoint:
+        final multiPoint = feature as GeoJsonMultiPoint;
+        if(boundingBox.containsAny(multiPoint.geoSerie?.geoPoints??[])) {
+          return true;
+        }
+        return false;
+      case GeoJsonFeatureType.point:
+        final point = feature as GeoJsonPoint;
+        if(boundingBox.containsAny([point.geoPoint])) {
+          return true;
+        }
+        return false;
+    }
+    return false;
+  }
+
   static GeoJsonFeature<dynamic>? _processGeometry(
       Map<String, dynamic> geometry,
       Map<String, dynamic>? properties,
@@ -544,10 +603,17 @@ class GeoJson {
           continue;
         }
       }
+      if(query?.boundingBox != null) {
+        if(!_isOverlapping(query!.boundingBox!, feature)) {
+          continue;
+        }
+      }
       if (iso != null) {
         iso.send(feature);
       } else {
-        print("FEAT SINK $feature / ${feature?.type}");
+        if (verbose == true) {
+          print("FEAT SINK $feature / ${feature?.type}");
+        }
         sink?.add(feature);
       }
       if (verbose == true) {
