@@ -344,7 +344,7 @@ class GeoBoundingBox {
       throw ArgumentError.value(coords[0], "Min longitude larger than max longitude");
     }
     if(coords[1] > coords[3]) {
-      throw ArgumentError.value(coords[0], "Min latitude larger than max longitude");
+      throw ArgumentError.value(coords[0], "Min latitude larger than max latitude");
     }
   }
 
