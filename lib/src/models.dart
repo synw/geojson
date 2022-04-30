@@ -338,7 +338,15 @@ class GeoJsonQuery {
 class GeoBoundingBox {
 
   /// Creates a new GeoBoundingBox instance with the supplied min/max coordinates
-  GeoBoundingBox({required this.coords});
+  GeoBoundingBox({required this.coords})
+  {
+    if(coords[0] > coords[2]) {
+      throw ArgumentError.value(coords[0], "Min longitude larger than max longitude");
+    }
+    if(coords[1] > coords[3]) {
+      throw ArgumentError.value(coords[0], "Min latitude larger than max longitude");
+    }
+  }
 
   /// Coordinates of the bounding box
   /// [min longitude, min latitude, max longitude, max latitude]

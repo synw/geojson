@@ -624,7 +624,7 @@ class GeoJson {
       if (query?.boundingBox != null) {
         if (!_isOverlapping(query!.boundingBox!, feature)) {
           if (verbose == true) {
-            print("Skipping out of bounds feature $feature / ${feature?.type}");
+            print("Skipping out of bounds feature ${feature?.type} ${feature?.geometry?.name}");
           }
           continue;
         }
