@@ -198,6 +198,7 @@ class GeoJson {
         query: query);
     unawaited(iso.run(<dynamic>[dataToProcess]));
     await finished.future;
+    iso.dispose();
     _endSignalController.sink.add(true);
   }
 
@@ -261,6 +262,7 @@ class GeoJson {
         points: points, point: point, distance: distance, verbose: verbose);
     unawaited(iso.run(<dynamic>[dataToProcess]));
     await finished.future;
+    iso.dispose();
     return foundPoints;
   }
 
@@ -313,6 +315,7 @@ class GeoJson {
         _GeoFenceToProcess(points: points, polygon: polygon, verbose: verbose);
     unawaited(iso.run(<dynamic>[dataToProcess]));
     await finished.future;
+    iso.dispose();
     return foundPoints;
   }
 
@@ -627,9 +630,6 @@ class GeoJson {
         }
       }
       if (iso != null) {
-        if (verbose == true) {
-          print("Sending feature $feature / ${feature?.type}");
-        }
         iso.send(feature);
       } else {
         if (verbose == true) {
