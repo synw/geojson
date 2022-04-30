@@ -307,7 +307,7 @@ class GeoJsonQuery {
       this.searchType = GeoSearchType.exact,
       this.boundingBox,}) {
     if (geometryType == null) {
-      if (property == null || value == null) {
+      if (property == null || value == null || boundingBox == null) {
         throw ArgumentError.notNull(
             "Property and value must not be null if no geometry "
             "type is provided");
