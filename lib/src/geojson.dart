@@ -627,6 +627,9 @@ class GeoJson {
         }
       }
       if (iso != null) {
+        if (verbose == true) {
+          print("Sending feature $feature / ${feature?.type}");
+        }
         iso.send(feature);
       } else {
         if (verbose == true) {
