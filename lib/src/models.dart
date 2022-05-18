@@ -363,8 +363,8 @@ class GeoBoundingBox {
     final maxLat = coords[3];
 
     final pMinLon = points.map((e) => e.longitude).reduce(min);
-    final pMaxLon = points.map((e) => e.longitude).reduce(min);
-    final pMinLat = points.map((e) => e.latitude).reduce(max);
+    final pMaxLon = points.map((e) => e.longitude).reduce(max);
+    final pMinLat = points.map((e) => e.latitude).reduce(min);
     final pMaxLat = points.map((e) => e.latitude).reduce(max);
 
     // check if bounding box rectangle is outside the other, if it is then it's
