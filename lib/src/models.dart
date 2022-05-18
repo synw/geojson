@@ -358,8 +358,8 @@ class GeoBoundingBox {
 
     // check if bounding box rectangle contains any of the provided points
     final minLon = coords[0];
-    final minLat = coords[1];
     final maxLon = coords[2];
+    final minLat = coords[1];
     final maxLat = coords[3];
 
     final pMinLon = points.map((e) => e.longitude).reduce(min);
@@ -369,10 +369,10 @@ class GeoBoundingBox {
 
     // check if bounding box rectangle is outside the other, if it is then it's
     // considered not overlapping
-    if (pMinLat > maxLat ||
-        pMaxLat < minLat ||
-        pMinLon < maxLon ||
-        pMaxLon > minLon) {
+    if (minLat > pMaxLat ||
+        maxLat < pMinLat ||
+        minLon < pMaxLon ||
+        maxLon > pMinLon) {
       return false;
     }
 
