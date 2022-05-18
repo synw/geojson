@@ -371,8 +371,8 @@ class GeoBoundingBox {
     // considered not overlapping
     if (minLat > pMaxLat ||
         maxLat < pMinLat ||
-        minLon < pMaxLon ||
-        maxLon > pMinLon) {
+        minLon > pMaxLon ||
+        maxLon < pMinLon) {
       return false;
     }
 
