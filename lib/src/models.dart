@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:geodesy/geodesy.dart';
 import 'package:geopoint/geopoint.dart';
@@ -353,22 +354,29 @@ class GeoBoundingBox {
   final List<double> coords;
 
   /// Checks if any of the points are withing the bounds defined by the bounding box
-  bool containsAny(Iterable<GeoPoint> points) {
+  bool isOverlapping(Iterable<GeoPoint> points) {
 
     // check if bounding box rectangle contains any of the provided points
-
     final minLon = coords[0];
     final minLat = coords[1];
     final maxLon = coords[2];
     final maxLat = coords[3];
 
-    for (var p in points) {
-      if (p.latitude >= minLat && p.latitude <= maxLat && p.longitude >= minLon && p.longitude <= maxLon) {
-        return true;
-      }
+    final pMinLon = points.map((e) => e.longitude).reduce(min);
+    final pMaxLon = points.map((e) => e.longitude).reduce(min);
+    final pMinLat = points.map((e) => e.latitude).reduce(max);
+    final pMaxLat = points.map((e) => e.latitude).reduce(max);
+
+    // check if bounding box rectangle is outside the other, if it is then it's
+    // considered not overlapping
+    if (pMinLat > maxLat ||
+        pMaxLat < minLat ||
+        pMinLon < maxLon ||
+        pMaxLon > minLon) {
+      return false;
     }
 
-    return false;
+    return true;
   }
 }
 

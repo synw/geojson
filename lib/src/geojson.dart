@@ -370,7 +370,7 @@ class GeoJson {
         final multiPolygon = geometry as GeoJsonMultiPolygon;
         for (final polygon in multiPolygon.polygons) {
           if (boundingBox
-              .containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
+              .isOverlapping(polygon.geoSeries.expand((e) => e.geoPoints))) {
             return true;
           }
         }
@@ -378,32 +378,32 @@ class GeoJson {
       case GeoJsonFeatureType.polygon:
         final polygon = geometry as GeoJsonPolygon;
         if (boundingBox
-            .containsAny(polygon.geoSeries.expand((e) => e.geoPoints))) {
+            .isOverlapping(polygon.geoSeries.expand((e) => e.geoPoints))) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.multiline:
         final multiLine = geometry as GeoJsonMultiLine;
-        if (boundingBox.containsAny(
+        if (boundingBox.isOverlapping(
             multiLine.lines.expand((e) => e.geoSerie?.geoPoints ?? []))) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.line:
         final line = geometry as GeoJsonLine;
-        if (boundingBox.containsAny(line.geoSerie?.geoPoints ?? [])) {
+        if (boundingBox.isOverlapping(line.geoSerie?.geoPoints ?? [])) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.multipoint:
         final multiPoint = geometry as GeoJsonMultiPoint;
-        if (boundingBox.containsAny(multiPoint.geoSerie?.geoPoints ?? [])) {
+        if (boundingBox.isOverlapping(multiPoint.geoSerie?.geoPoints ?? [])) {
           return true;
         }
         return false;
       case GeoJsonFeatureType.point:
         final point = geometry as GeoJsonPoint;
-        if (boundingBox.containsAny([point.geoPoint])) {
+        if (boundingBox.isOverlapping([point.geoPoint])) {
           return true;
         }
         return false;
