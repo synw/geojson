@@ -80,6 +80,8 @@ class GeoJson {
   /// Use it to dispose the class if not needed anymore after parsing
   Stream<bool> get endSignal => _endSignalController.stream;
 
+  bool _disposed = false;
+
   // internal method
   Stream<T> _getGeoStream<T>() => _processedFeaturesController.stream
       .asBroadcastStream()
@@ -113,6 +115,10 @@ class GeoJson {
 
   void _pipeFeature(GeoJsonFeature<dynamic> data,
       {required bool disableStream}) {
+    if(_disposed) {
+      return;
+    }
+
     dynamic item;
     switch (data.type) {
       case GeoJsonFeatureType.point:
@@ -345,6 +351,7 @@ class GeoJson {
 
   /// Dispose the class when finished using it
   void dispose() {
+    _disposed = true;
     _processedFeaturesController.close();
     _endSignalController.close();
   }
