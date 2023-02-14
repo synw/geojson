@@ -115,7 +115,7 @@ class GeoJson {
 
   void _pipeFeature(GeoJsonFeature<dynamic> data,
       {required bool disableStream}) {
-    if(_disposed) {
+    if (_disposed) {
       return;
     }
 
@@ -147,8 +147,10 @@ class GeoJson {
         break;
       case GeoJsonFeatureType.geometryCollection:
     }
-    if (!disableStream) {
-      if (item != null) _processedFeaturesController.sink.add(item);
+    if (!disableStream && !_processedFeaturesController.isClosed) {
+      if (item != null) {
+        _processedFeaturesController.sink.add(item);
+      }
       _processedFeaturesController.sink.add(data);
     }
     features.add(data);
@@ -254,7 +256,7 @@ class GeoJson {
       if (data is GeoJsonPoint) {
         final point = data;
         foundPoints.add(point);
-        if (!disableStream) {
+        if (!disableStream && !_processedFeaturesController.isClosed) {
           _processedFeaturesController.sink.add(point);
         }
       } else {
@@ -307,7 +309,7 @@ class GeoJson {
       if (data is GeoJsonPoint) {
         final point = data;
         foundPoints.add(point);
-        if (!disableStream) {
+        if (!disableStream && !_processedFeaturesController.isClosed) {
           _processedFeaturesController.sink.add(point);
         }
       } else {
@@ -631,7 +633,8 @@ class GeoJson {
       if (query?.boundingBox != null) {
         if (!_isOverlapping(query!.boundingBox!, feature)) {
           if (verbose == true) {
-            print("Skipping out of bounds feature ${feature?.type} ${feature?.geometry?.name}");
+            print(
+                "Skipping out of bounds feature ${feature?.type} ${feature?.geometry?.name}");
           }
           continue;
         }
