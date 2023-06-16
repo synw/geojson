@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Add bounding box search option
+- Read files inside isolate
+- Correctly dispose and cleanup objects
+
 ## 1.0.0
 
 Migration to null safety

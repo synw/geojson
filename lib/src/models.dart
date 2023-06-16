@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:math';
 
-import 'package:geopoint/geopoint.dart';
+import 'geopoint/geopoint.dart';
+import 'geopoint/geoserie.dart';
 
 /// Geojson feature types
 enum GeoJsonFeatureType {
@@ -298,13 +300,15 @@ enum GeoSearchType {
 /// A geojson query for search
 class GeoJsonQuery {
   /// Provide a [geometryType] and/or a [property] and [value]
-  GeoJsonQuery(
-      {this.property,
-      this.value,
-      this.geometryType,
-      this.matchCase = true,
-      this.searchType = GeoSearchType.exact}) {
-    if (geometryType == null) {
+  GeoJsonQuery({
+    this.property,
+    this.value,
+    this.geometryType,
+    this.matchCase = true,
+    this.searchType = GeoSearchType.exact,
+    this.boundingBox,
+  }) {
+    if (geometryType == null && boundingBox == null) {
       if (property == null || value == null) {
         throw ArgumentError.notNull(
             "Property and value must not be null if no geometry "
@@ -327,6 +331,53 @@ class GeoJsonQuery {
 
   /// Match the case of string or not
   final bool matchCase;
+
+  /// Bounding box to search for features that overlap
+  final GeoBoundingBox? boundingBox;
+}
+
+/// A Geo Bounding Box used for search
+class GeoBoundingBox {
+  /// Creates a new GeoBoundingBox instance with the supplied min/max coordinates
+  GeoBoundingBox({required this.coords}) {
+    if (coords[0] > coords[2]) {
+      throw ArgumentError.value(
+          coords[0], "Min longitude larger than max longitude");
+    }
+    if (coords[1] > coords[3]) {
+      throw ArgumentError.value(
+          coords[0], "Min latitude larger than max latitude");
+    }
+  }
+
+  /// Coordinates of the bounding box
+  /// [min longitude, min latitude, max longitude, max latitude]
+  final List<double> coords;
+
+  /// Checks if any of the points are withing the bounds defined by the bounding box
+  bool isOverlapping(Iterable<GeoPoint> points) {
+    // check if bounding box rectangle contains any of the provided points
+    final minLon = coords[0];
+    final maxLon = coords[2];
+    final minLat = coords[1];
+    final maxLat = coords[3];
+
+    final pMinLon = points.map((e) => e.longitude).reduce(min);
+    final pMaxLon = points.map((e) => e.longitude).reduce(max);
+    final pMinLat = points.map((e) => e.latitude).reduce(min);
+    final pMaxLat = points.map((e) => e.latitude).reduce(max);
+
+    // check if bounding box rectangle is outside the other, if it is then it's
+    // considered not overlapping
+    if (minLat > pMaxLat ||
+        maxLat < pMinLat ||
+        minLon > pMaxLon ||
+        maxLon < pMinLon) {
+      return false;
+    }
+
+    return true;
+  }
 }
 
 String _buildGeoJsonFeature(
