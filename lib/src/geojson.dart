@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:geodesy/geodesy.dart';
-import 'package:iso/iso.dart';
 import 'package:pedantic/pedantic.dart';
 
 import 'deserializers.dart';
 import 'exceptions.dart';
+import 'iso/iso.dart';
+import 'iso/runner.dart';
 import 'models.dart';
 
 /// The main geojson class
@@ -556,7 +557,7 @@ class GeoJson {
           if (nameProperty != null) {
             feature.geometry.name = properties![nameProperty];
           }
-          for (final geom in geometry["geometries"]) {
+          for (final geom in geometry["geometries"] as Iterable) {
             feature.geometry.add(_processGeometry(
                 geom as Map<String, dynamic>, properties, nameProperty));
           }

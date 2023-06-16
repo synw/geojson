@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:geodesy/geodesy.dart';
-import 'package:geopoint/geopoint.dart';
+import 'geopoint/geopoint.dart';
+import 'geopoint/geoserie.dart';
 
 /// Geojson feature types
 enum GeoJsonFeatureType {
@@ -300,13 +300,14 @@ enum GeoSearchType {
 /// A geojson query for search
 class GeoJsonQuery {
   /// Provide a [geometryType] and/or a [property] and [value]
-  GeoJsonQuery(
-      {this.property,
-      this.value,
-      this.geometryType,
-      this.matchCase = true,
-      this.searchType = GeoSearchType.exact,
-      this.boundingBox,}) {
+  GeoJsonQuery({
+    this.property,
+    this.value,
+    this.geometryType,
+    this.matchCase = true,
+    this.searchType = GeoSearchType.exact,
+    this.boundingBox,
+  }) {
     if (geometryType == null && boundingBox == null) {
       if (property == null || value == null) {
         throw ArgumentError.notNull(
@@ -337,15 +338,15 @@ class GeoJsonQuery {
 
 /// A Geo Bounding Box used for search
 class GeoBoundingBox {
-
   /// Creates a new GeoBoundingBox instance with the supplied min/max coordinates
-  GeoBoundingBox({required this.coords})
-  {
-    if(coords[0] > coords[2]) {
-      throw ArgumentError.value(coords[0], "Min longitude larger than max longitude");
+  GeoBoundingBox({required this.coords}) {
+    if (coords[0] > coords[2]) {
+      throw ArgumentError.value(
+          coords[0], "Min longitude larger than max longitude");
     }
-    if(coords[1] > coords[3]) {
-      throw ArgumentError.value(coords[0], "Min latitude larger than max latitude");
+    if (coords[1] > coords[3]) {
+      throw ArgumentError.value(
+          coords[0], "Min latitude larger than max latitude");
     }
   }
 
@@ -355,7 +356,6 @@ class GeoBoundingBox {
 
   /// Checks if any of the points are withing the bounds defined by the bounding box
   bool isOverlapping(Iterable<GeoPoint> points) {
-
     // check if bounding box rectangle contains any of the provided points
     final minLon = coords[0];
     final maxLon = coords[2];
