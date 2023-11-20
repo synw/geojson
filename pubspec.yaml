@@ -8,7 +8,7 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  geodesy: ^0.4.0-nullsafety.0
+  geodesy: ^0.10.2
   geopoint: ^1.0.0
   iso: ^1.0.0
   pedantic: ^1.11.1
